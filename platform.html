@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проект Платформа | Выборы 2026-2027</title>
+    <meta name="description" content="Создаем реально работающий парламент. Упрощаем жизнь школы.">
+    
+    <!-- Шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Строгая палитра */
+            --navy: #0A1324; 
+            --navy-light: #16243D;
+            --white: #FFFFFF;
+            --off-white: #F8F9FA;
+            --text-main: #0A1324;
+            --text-muted: #5A6B85;
+            --border: #E2E8F0;
+            
+            /* Типографика */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            
+            /* Очень плавные анимации */
+            --ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+            --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-slow: 1s var(--ease-slow);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--white);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        /* === ПРЕЛОАДЕР === */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--navy);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1.2s var(--ease-smooth), visibility 1.2s;
+        }
+
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(1.05);
+        }
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateY(-20px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+
+        .logo-mark {
+            width: 90px;
+            height: 75px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chevron {
+            width: 100%;
+            height: 34px;
+            fill: currentColor;
+            transform-origin: center;
+            opacity: 0;
+        }
+
+        .chevron-1 {
+            transform: translateY(20px);
+            animation: slideUpIn 1s var(--ease-slow) forwards 0.3s;
+        }
+
+        .chevron-2 {
+            transform: translateY(20px);
+            animation: slideUpIn 1s var(--ease-slow) forwards 0.5s;
+        }
+
+        .logo-text {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 3.5rem;
+            letter-spacing: -0.03em;
+            clip-path: inset(0 100% 0 0);
+            opacity: 0;
+            animation: revealText 1.2s var(--ease-slow) forwards 0.8s;
+        }
+
+        .rotating-text-wrapper {
+            padding-left: 114px; 
+            height: 36px; 
+            overflow: hidden; 
+            position: relative;
+            opacity: 0;
+            margin-top: -4px; 
+            animation: fadeInText 1.2s ease forwards 1.8s; 
+            width: 100%;
+        }
+
+        .rotating-list {
+            display: flex;
+            flex-direction: column;
+            transition: transform 1s var(--ease-slow);
+        }
+
+        .rotating-item {
+            height: 36px;
+            line-height: 36px;
+            font-size: 1.25rem;
+            font-family: var(--font-body);
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.5);
+            white-space: nowrap;
+            transition: filter 1s ease, opacity 1s ease;
+            letter-spacing: 0.02em;
+        }
+
+        .rotating-item.blur-out { filter: blur(10px); opacity: 0; transform: translateX(-10px); }
+        .rotating-item.blur-in { filter: blur(0); opacity: 1; transform: translateX(0); }
+
+        @keyframes slideUpIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes revealText { to { clip-path: inset(0 0 0 0); opacity: 1; } }
+        @keyframes fadeInText { to { opacity: 1; } }
+
+        /* === ОСНОВНОЙ САЙТ === */
+        .main-content {
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        .main-content.visible {
+            opacity: 1;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Навигация */
+        header {
+            padding: 40px 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--white);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo svg {
+            width: 26px;
+            height: 22px;
+            fill: var(--white);
+        }
+
+        .nav-email {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            opacity: 0.6;
+            transition: opacity 0.4s var(--ease-smooth);
+            letter-spacing: 0.02em;
+        }
+        .nav-email:hover { opacity: 1; }
+
+        /* Hero Секция */
+        .hero {
+            background-color: var(--navy);
+            color: var(--white);
+            padding: 240px 0 160px 0;
+            min-height: 90vh;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 40px;
+        }
+
+        .hero-tag::before {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: rgba(255,255,255,0.6);
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(3.5rem, 7vw, 6.5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+            margin-bottom: 40px;
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 650px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* Секция Принципы (Миссия) */
+        .principles-section {
+            padding: 140px 0;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+        }
+
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+        }
+
+        .principle-item {
+            border-top: 1px solid var(--border);
+            padding-top: 30px;
+        }
+
+        .principle-item h3 {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 20px;
+        }
+
+        .principle-item p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* Таймер */
+        .timer-section {
+            padding: 120px 0;
+            background-color: var(--off-white);
+        }
+
+        .timer-header {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+
+        .timer-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timer-value {
+            font-family: var(--font-heading);
+            font-size: clamp(4rem, 8vw, 7rem);
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .timer-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Направления */
+        .pillars-section {
+            padding: 160px 0;
+            background-color: var(--white);
+        }
+
+        .pillars-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .pillar-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr;
+            gap: 40px;
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.4s var(--ease-smooth), padding-left 0.4s var(--ease-smooth);
+        }
+
+        .pillar-row:hover {
+            background-color: var(--off-white);
+            padding-left: 20px;
+            border-radius: 8px;
+        }
+
+        .pillar-row:first-child {
+            border-top: 1px solid var(--border);
+        }
+
+        .pillar-num {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--navy);
+            padding-top: 5px;
+        }
+
+        .pillar-title {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: -0.02em;
+        }
+
+        .pillar-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .pillar-desc ul {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .pillar-desc li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--navy);
+        }
+
+        .pillar-desc li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+        }
+
+        /* Команда */
+        .team-section {
+            padding: 140px 0;
+            background-color: var(--navy);
+            color: var(--white);
+        }
+
+        .team-section .section-title {
+            color: var(--white);
+        }
+
+        .team-section .section-label {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-top: 80px;
+        }
+
+        .team-card {
+            padding: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: border-color 0.5s var(--ease-smooth), background-color 0.5s var(--ease-smooth);
+        }
+
+        .team-card:hover {
+            border-color: rgba(255,255,255,0.4);
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .team-name {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .team-role {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .team-quote {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        /* Футер (Минимализм) */
+        footer {
+            background-color: #060B14;
+            color: var(--white);
+            padding: 120px 0; /* Сделали одинаковые отступы сверху и снизу, так как убрали нижний блок */
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            /* Убрали margin-bottom и border-bottom, так как нет нижней части */
+        }
+
+        .footer-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 4vw, 3.5rem); /* Немного адаптивнее */
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            max-width: 600px;
+            line-height: 1.1;
+        }
+
+        .footer-email {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--white);
+            text-decoration: none;
+            position: relative;
+            padding-bottom: 8px;
+            transition: color 0.4s ease;
+        }
+
+        .footer-email::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            transition: background 0.4s var(--ease-smooth);
+        }
+
+        .footer-email:hover::after {
+            background: var(--white);
+        }
+
+        /* === АНИМАЦИИ ПОЯВЛЕНИЯ === */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1.2s var(--ease-slow), transform 1.2s var(--ease-slow);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.15s; }
+        .reveal-delay-2 { transition-delay: 0.3s; }
+        .reveal-delay-3 { transition-delay: 0.45s; }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .grid-header { grid-template-columns: 1fr; gap: 20px; }
+            .principles-grid { grid-template-columns: 1fr; gap: 40px; }
+            .pillar-row { grid-template-columns: 1fr; gap: 20px; padding: 40px 0; }
+            .pillar-num { display: none; }
+            .team-grid { grid-template-columns: 1fr; }
+            .footer-content { flex-direction: column; align-items: flex-start; gap: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 24px; }
+            .hero h1 { font-size: 3rem; }
+            .timer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+            .timer-value { font-size: 3.5rem; }
+            .footer-email { font-size: 1.4rem; }
+            
+            /* Прелоадер на телефонах */
+            .logo-container { flex-direction: column; gap: 5px; }
+            .logo-mark { width: 60px; height: 45px; }
+            .chevron { height: 22px; }
+            .logo-text { font-size: 2.2rem; }
+            .rotating-text-wrapper { padding-left: 0; text-align: center; }
+            .rotating-item { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- === ПРЕЛОАДЕР === -->
+    <div class="preloader" id="preloader">
+        <div class="brand-container">
+            <div class="logo-container">
+                <svg class="logo-mark" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+                    <path class="chevron chevron-1" d="M12 80 L60 52 L108 80 L108 65 L60 37 L12 65 Z" />
+                    <path class="chevron chevron-2" d="M12 52 L60 24 L108 52 L108 37 L60 9 L12 37 Z" />
+                </svg>
+                <div class="logo-text">Платформа</div>
+            </div>
+            <div class="rotating-text-wrapper">
+                <div class="rotating-list" id="rotatingList">
+                    <div class="rotating-item">коммуникация</div>
+                    <div class="rotating-item">проекты</div>
+                    <div class="rotating-item">школьное самоуправление</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === ОСНОВНОЙ САЙТ === -->
+    <div class="main-content" id="mainContent">
+        
+        <!-- Навигация -->
+        <header>
+            <div class="container nav-inner">
+                <a href="#" class="nav-logo">
+                    <svg viewBox="0 0 120 100"><path d="M12 80 L60 52 L108 80 L108 65 L60 37 L12 65 Z" /><path d="M12 52 L60 24 L108 52 L108 37 L60 9 L12 37 Z" /></svg>
+                    Платформа
+                </a>
+                <a href="mailto:platform.novo@inbox.ru" class="nav-email">platform.novo@inbox.ru</a>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content reveal active">
+                    <div class="hero-tag">Выборы 2026 – 2027 Новошкола</div>
+                    <h1>Создаем реально работающий парламент.</h1>
+                    <p>Наша цель — упростить жизнь школы и внести важные изменения. Проект «Платформа» — это не просто обещания. Это четкая система действий, где каждый голос имеет вес.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Принципы (Миссия) -->
+        <section class="principles-section">
+            <div class="container">
+                <div class="grid-header reveal">
+                    <div class="section-label"></div>
+                    <h2 class="section-title">Почему мы это делаем?</h2>
+                </div>
+                
+                <div class="principles-grid">
+                    <div class="principle-item reveal reveal-delay-1">
+                        <h3>Прозрачность решений</h3>
+                        <p>Наша команда избирается, чтобы реформировать школьное самоуправление до реально работающего вида. </p>
+                    </div>
+                    <div class="principle-item reveal reveal-delay-2">
+                        <h3>Реальные изменения</h3>
+                        <p>Проект «Платформа» — это механизм, который упростит жизнь школы и сделает её комфортнее.</p>
+                    </div>
+                    <div class="principle-item reveal reveal-delay-3">
+                        <h3>Преемственность</h3>
+                        <p>Мы намерены заложить фундамент, чтобы в дальнейшем проект продолжал жить, развиваться и приносить пользу школе.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Таймер -->
+        <section class="timer-section">
+            <div class="container reveal">
+                <div class="timer-header">До открытия Роуд-мапы и запуска проекта</div>
+                <div class="timer-grid" id="countdown">
+                    <div class="timer-box">
+                        <div class="timer-value" id="days">00</div>
+                        <div class="timer-label">Дней</div>
+                    </div>
+                    <div class="timer-box">
+                        <div class="timer-value" id="hours">00</div>
+                        <div class="timer-label">Часов</div>
+                    </div>
+                    <div class="timer-box">
+                        <div class="timer-value" id="minutes">00</div>
+                        <div class="timer-label">Минут</div>
+                    </div>
+                    <div class="timer-box">
+                        <div class="timer-value" id="seconds">00</div>
+                        <div class="timer-label">Секунд</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Направления -->
+        <section class="pillars-section">
+            <div class="container">
+                <div class="grid-header reveal">
+                    <div class="section-label">Что мы делаем</div>
+                    <h2 class="section-title">Наши направления</h2>
+                </div>
+                
+                <div class="pillars-list">
+                    <!-- 1 -->
+                    <div class="pillar-row reveal">
+                        <div class="pillar-num">01</div>
+                        <div class="pillar-title">Платформа.<br>Коммуникация</div>
+                        <div class="pillar-desc">
+                            Создаст безопасное и простое объединение, а также безопасные каналы общения между школой и учениками.
+                            <ul>
+                                <li>Анонимные опросы и сбор обратной связи</li>
+                                <li>Система защиты от буллинга</li>
+                                <li>Прямой диалог с администрацией</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 2 -->
+                    <div class="pillar-row reveal">
+                        <div class="pillar-num">02</div>
+                        <div class="pillar-title">Платформа.<br>Проекты</div>
+                        <div class="pillar-desc">
+                            Превратит интересные идеи в реальность. От банальной работы в цифровой среде до мероприятий.
+                            <ul>
+                                <li>Оцифровка школьных процессов</li>
+                                <li>Организация досуга и событий</li>
+                                <li>Поддержка любых ученических инициатив</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 3 -->
+                    <div class="pillar-row reveal">
+                        <div class="pillar-num">03</div>
+                        <div class="pillar-title">Изменения<br>самоуправления</div>
+                        <div class="pillar-desc">
+                            Намерены изменить школьное самоуправление до работающего вида.
+                            <ul>
+                                <li>Четкое распределение обязанностей</li>
+                                <li></li>
+                                <li>Создание работающей системы на годы вперед</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Команда -->
+        <section class="team-section">
+            <div class="container">
+                <div class="grid-header reveal">
+                    <div class="section-label">Кто мы</div>
+                    <h2 class="section-title">Наша команда</h2>
+                </div>
+                
+                <div class="team-grid">
+                    <div class="team-card reveal reveal-delay-1">
+                        <h3 class="team-name">Баширова София</h3>
+                        <span class="team-role">Лидер проекта</span>
+                        <p class="team-quote"></p>
+                    </div>
+                    <div class="team-card reveal reveal-delay-2">
+                        <h3 class="team-name">Айдарбеков Тамерлан</h3>
+                        <span class="team-role">Лидер проекта</span>
+                        <p class="team-quote"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Футер -->
+        <footer>
+            <div class="container">
+                <div class="footer-content reveal">
+                    <h2 class="footer-title">Хотите стать частью команды или помочь?</h2>
+                    <a href="mailto:platform.novo@inbox.ru" class="footer-email">platform.novo@inbox.ru</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // === 1. ЛОГИКА ПРЕЛОАДЕРА И КАРУСЕЛИ ===
+            const preloader = document.getElementById("preloader");
+            const mainContent = document.getElementById("mainContent");
+            const list = document.getElementById("rotatingList");
+            const items = list.querySelectorAll(".rotating-item");
+            let currentIndex = 0;
+            const totalItems = items.length;
+            
+            let itemHeight = items[0].offsetHeight; 
+
+            window.addEventListener('resize', () => {
+                itemHeight = items[0].offsetHeight;
+                list.style.transition = 'none';
+                list.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
+                setTimeout(() => {
+                    list.style.transition = 'transform 1s cubic-bezier(0.16, 1, 0.3, 1)';
+                }, 50);
+            });
+
+            items[0].classList.add("blur-in");
+
+            const rotateText = () => {
+                items[currentIndex].classList.add("blur-out");
+                items[currentIndex].classList.remove("blur-in");
+
+                currentIndex = (currentIndex + 1) % totalItems;
+                list.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
+
+                items[currentIndex].classList.remove("blur-out");
+                items[currentIndex].classList.add("blur-in");
+
+                if (currentIndex === 0) {
+                    setTimeout(() => {
+                        list.style.transition = "none";
+                        list.style.transform = "translateY(0)";
+                        items.forEach(item => {
+                            item.classList.remove("blur-out");
+                            item.classList.add("blur-in");
+                        });
+                        setTimeout(() => {
+                            list.style.transition = "transform 1s cubic-bezier(0.16, 1, 0.3, 1)";
+                        }, 50);
+                    }, 1000); 
+                }
+            };
+
+            const carouselInterval = setInterval(rotateText, 2800);
+
+            setTimeout(() => {
+                clearInterval(carouselInterval);
+                preloader.classList.add("hidden");
+                
+                setTimeout(() => {
+                    mainContent.classList.add("visible");
+                }, 300);
+            }, 5500); 
+
+            // === 2. ЛОГИКА ТАЙМЕРА (До 10 Ноября 2026) ===
+            const targetDate = new Date("November 10, 2026 00:00:00").getTime();
+
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    document.getElementById("countdown").innerHTML = "<h3 style='color: var(--navy); font-size: 2rem; font-family: var(--font-heading);'>Проект запущен! Роуд-мапа открыта!</h3>";
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+                document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+                document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+                document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+            };
+
+            setInterval(updateTimer, 1000);
+            updateTimer();
+
+            // === 3. АНИМАЦИИ ПРИ СКРОЛЛЕ ===
+            const revealElements = document.querySelectorAll('.reveal');
+
+            const revealOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -100px 0px"
+            };
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+
+            revealElements.forEach(el => {
+                revealObserver.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
