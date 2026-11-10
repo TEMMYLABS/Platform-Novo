@@ -21,6 +21,7 @@
             --text-main: #0A1324;
             --text-muted: #5A6B85;
             --border: #E2E8F0;
+            --accent-blue: #2B5CFF; /* Цвет для подсветки */
             
             /* Типографика */
             --font-heading: 'Montserrat', sans-serif;
@@ -234,7 +235,8 @@
         }
 
         .hero-content {
-            max-width: 1000px;
+            max-width: 1100px;
+            width: 100%;
         }
 
         .hero-tag {
@@ -246,7 +248,7 @@
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: rgba(255,255,255,0.6);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .hero-tag::before {
@@ -256,21 +258,53 @@
             background: rgba(255,255,255,0.6);
         }
 
+        /* Исправленный заголовок с машинкой */
         .hero h1 {
             font-family: var(--font-heading);
-            font-size: clamp(3.5rem, 7vw, 6.5rem);
+            font-size: clamp(2.5rem, 5.5vw, 5rem);
             font-weight: 900;
-            line-height: 1.05;
+            line-height: 1.15;
             letter-spacing: -0.04em;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            min-height: 2.3em;
+            display: block;
+            word-wrap: break-word;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 4px;
+            height: 0.9em;
+            background-color: var(--accent-blue);
+            margin-left: 6px;
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+            margin-bottom: 0.1em;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         .hero p {
-            font-size: 1.4rem;
-            color: rgba(255, 255, 255, 0.6);
-            max-width: 650px;
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 800px;
             font-weight: 300;
-            line-height: 1.6;
+            line-height: 1.7;
+            opacity: 0;
+            animation: fadeInText 1s ease forwards 1s;
+        }
+
+        /* Яркая подсветка ключевых слов */
+        .hero p .highlight {
+            color: var(--white);
+            font-weight: 600;
+            background: rgba(43, 92, 255, 0.2);
+            border-bottom: 2px solid var(--accent-blue);
+            padding: 0 4px;
+            border-radius: 2px 2px 0 0;
         }
 
         /* Секция Принципы (Миссия) */
@@ -329,58 +363,425 @@
             line-height: 1.8;
         }
 
-        /* Таймер */
-        .timer-section {
-            padding: 120px 0;
+        /* === РОУД-МАПА (2 ШАГА) === */
+        .roadmap-section {
+            padding: 140px 0;
             background-color: var(--off-white);
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .roadmap-timeline {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 60px;
+            margin-top: 80px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .roadmap-step {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.6s var(--ease-smooth);
+        }
+
+        .step-marker {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 30px;
+            transition: all 0.4s var(--ease-smooth);
+        }
+
+        .step-content {
+            background: var(--white);
+            padding: 40px 30px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            width: 100%;
+            transition: all 0.6s var(--ease-smooth);
+        }
+
+        .step-content h3 {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 15px;
+        }
+
+        .step-content p {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* Шаг 1 (Выборы) - Активный */
+        .step-election .step-marker {
+            border-color: var(--navy);
+            background: var(--navy);
+            color: var(--white);
+            box-shadow: 0 0 0 8px rgba(10, 19, 36, 0.1);
+        }
+
+        .step-election .step-content {
+            background: var(--navy);
+            color: var(--white);
+            border-color: var(--navy);
+            box-shadow: 0 20px 40px rgba(10, 19, 36, 0.15);
+        }
+
+        .step-election .step-content h3 { color: var(--white); font-size: 1.6rem; }
+        .step-election .step-content p { color: rgba(255,255,255,0.7); margin-bottom: 20px; }
+
+        .candidate-name {
+            display: inline-block;
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--white);
+            background: rgba(43, 92, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .election-date {
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-blue);
+            margin-top: 15px;
+            font-weight: 700;
+        }
+
+        /* Шаг 2 (Запуск) - Блюр */
+        .step-future .step-content,
+        .step-future .step-marker {
+            opacity: 0.6;
+            filter: blur(2px);
+            transition: all 0.6s var(--ease-smooth);
+        }
+
+        .step-future:hover .step-content,
+        .step-future:hover .step-marker {
+            opacity: 1;
+            filter: blur(0);
+        }
+
+        /* === БЛОК ПРОГРАММЫ И САМОВЫДВИЖЕНИЯ === */
+        .program-section {
+            padding: 120px 0;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .program-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .program-card {
+            background: var(--off-white);
+            padding: 50px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .program-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--navy);
+            background: rgba(10, 19, 36, 0.05);
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .program-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .program-card p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            background: var(--navy);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-link:hover {
+            background: var(--accent-blue);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--navy);
+            border: 1px solid var(--navy);
+            width: 100%;
+            display: inline-flex;
+            justify-content: center;
+            padding: 16px 32px;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        /* === БЛОК СТРУКТУРЫ (КЛАСТЕР) - ИСПРАВЛЕН === */
+        .structure-section {
+            padding: 140px 0;
+            background-color: var(--off-white);
+        }
+
+        .structure-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 60px;
+            align-items: center;
+            margin-top: 60px;
+        }
+
+        .structure-text h3 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .structure-text p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .structure-text ul {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .structure-text li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--navy);
+        }
+
+        .structure-text li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--navy);
+            font-weight: 800;
+        }
+
+        /* Визуализация схемы (Исправленная сетка) */
+        .structure-visual {
+            position: relative;
+            height: 350px;
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 100px 1fr 140px;
+            align-items: center;
+            gap: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+
+        /* SVG Линии */
+        .lines-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .line-path {
+            stroke: var(--border);
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            transition: stroke-dashoffset 1.5s var(--ease-smooth) 0.5s, stroke 0.4s ease;
+        }
+
+        /* Колонки */
+        .flow-col-sectors {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2;
+        }
+
+        .flow-col-cluster {
+            display: flex;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .flow-col-admin {
+            display: flex;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        /* Блоки */
+        .box-sector {
+            background: var(--off-white);
+            border: 1px solid var(--border);
+            padding: 12px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--navy);
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.6s var(--ease-smooth);
+        }
+
+        .box-cluster {
+            background: var(--navy);
+            color: var(--white);
+            border: 2px solid var(--navy);
+            padding: 25px 15px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 1rem;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.6s var(--ease-smooth) 0.4s;
+        }
+
+        .box-admin {
+            background: var(--white);
+            border: 2px solid var(--navy);
+            padding: 25px 15px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 1rem;
+            text-align: center;
+            color: var(--navy);
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.6s var(--ease-smooth) 0.8s;
+        }
+
+        /* Активация схемы */
+        .structure-visual.active .box-sector,
+        .structure-visual.active .box-cluster,
+        .structure-visual.active .box-admin {
+            opacity: 1;
+            transform: translate(0) scale(1);
+        }
+
+        .structure-visual.active .line-path {
+            stroke-dashoffset: 0;
+            stroke: var(--navy); /* Линии становятся темными */
+        }
+
+        /* === ТАЙМЕР (ОДИН БЛОК) === */
+        .timer-section {
+            padding: 100px 0;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .timer-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: var(--off-white);
+            padding: 60px 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
         }
 
         .timer-header {
             font-size: 1rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
             color: var(--text-muted);
-            margin-bottom: 60px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .timer-header::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .timer-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 40px;
-        }
-
-        .timer-box {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .timer-value {
+        .timer-value-main {
             font-family: var(--font-heading);
-            font-size: clamp(4rem, 8vw, 7rem);
+            font-size: clamp(5rem, 10vw, 8rem);
             font-weight: 800;
             color: var(--navy);
             line-height: 1;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.04em;
         }
 
         .timer-label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-muted);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--navy);
             margin-top: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
         }
 
         /* Направления */
@@ -410,9 +811,7 @@
             border-radius: 8px;
         }
 
-        .pillar-row:first-child {
-            border-top: 1px solid var(--border);
-        }
+        .pillar-row:first-child { border-top: 1px solid var(--border); }
 
         .pillar-num {
             font-family: var(--font-heading);
@@ -464,13 +863,8 @@
             color: var(--white);
         }
 
-        .team-section .section-title {
-            color: var(--white);
-        }
-
-        .team-section .section-label {
-            color: rgba(255,255,255,0.5);
-        }
+        .team-section .section-title { color: var(--white); }
+        .team-section .section-label { color: rgba(255,255,255,0.5); }
 
         .team-grid {
             display: grid;
@@ -507,31 +901,22 @@
             display: block;
         }
 
-        .team-quote {
-            font-size: 1.1rem;
-            color: rgba(255,255,255,0.7);
-            font-style: italic;
-            font-weight: 300;
-            line-height: 1.8;
-        }
-
-        /* Футер (Минимализм) */
+        /* Футер */
         footer {
             background-color: #060B14;
             color: var(--white);
-            padding: 120px 0; /* Сделали одинаковые отступы сверху и снизу, так как убрали нижний блок */
+            padding: 120px 0;
         }
 
         .footer-content {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            /* Убрали margin-bottom и border-bottom, так как нет нижней части */
         }
 
         .footer-title {
             font-family: var(--font-heading);
-            font-size: clamp(2.5rem, 4vw, 3.5rem); /* Немного адаптивнее */
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
             font-weight: 800;
             letter-spacing: -0.03em;
             max-width: 600px;
@@ -560,9 +945,7 @@
             transition: background 0.4s var(--ease-smooth);
         }
 
-        .footer-email:hover::after {
-            background: var(--white);
-        }
+        .footer-email:hover::after { background: var(--white); }
 
         /* === АНИМАЦИИ ПОЯВЛЕНИЯ === */
         .reveal {
@@ -578,9 +961,8 @@
 
         .reveal-delay-1 { transition-delay: 0.15s; }
         .reveal-delay-2 { transition-delay: 0.3s; }
-        .reveal-delay-3 { transition-delay: 0.45s; }
 
-        /* Адаптивность */
+        /* === АДАПТИВНОСТЬ === */
         @media (max-width: 1024px) {
             .grid-header { grid-template-columns: 1fr; gap: 20px; }
             .principles-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -588,13 +970,15 @@
             .pillar-num { display: none; }
             .team-grid { grid-template-columns: 1fr; }
             .footer-content { flex-direction: column; align-items: flex-start; gap: 40px; }
+            
+            .roadmap-timeline { grid-template-columns: 1fr; gap: 40px; max-width: 500px; }
+            .structure-layout { grid-template-columns: 1fr; gap: 50px; }
+            .program-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
             .container { padding: 0 24px; }
-            .hero h1 { font-size: 3rem; }
-            .timer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
-            .timer-value { font-size: 3.5rem; }
+            .hero h1 { font-size: 2.2rem; min-height: 3em; }
             .footer-email { font-size: 1.4rem; }
             
             /* Прелоадер на телефонах */
@@ -604,6 +988,14 @@
             .logo-text { font-size: 2.2rem; }
             .rotating-text-wrapper { padding-left: 0; text-align: center; }
             .rotating-item { text-align: center; }
+            
+            .structure-visual { 
+                grid-template-columns: 80px 1fr 100px; 
+                padding: 20px; 
+                height: 300px;
+            }
+            .box-sector, .box-cluster, .box-admin { font-size: 0.7rem; padding: 10px 5px; }
+            .program-card { padding: 30px; }
         }
     </style>
 </head>
@@ -646,10 +1038,12 @@
         <!-- Hero -->
         <section class="hero">
             <div class="container">
-                <div class="hero-content reveal active">
+                <div class="hero-content">
                     <div class="hero-tag">Выборы 2026 – 2027 Новошкола</div>
-                    <h1>Создаем реально работающий парламент.</h1>
-                    <p>Наша цель — упростить жизнь школы и внести важные изменения. Проект «Платформа» — это не просто обещания. Это четкая система действий, где каждый голос имеет вес.</p>
+                    <h1>
+                        <span id="typewriter-text"></span><span class="cursor"></span>
+                    </h1>
+                    <p>Наша цель — <span class="highlight">упростить жизнь школы</span> и внести важные изменения. На выборах от проекта «Платформа» избирается <span class="highlight">София Баширова</span>. Это <span class="highlight">четкая система действий</span>, где <span class="highlight">каждый голос имеет вес</span>.</p>
                 </div>
             </div>
         </section>
@@ -665,13 +1059,13 @@
                 <div class="principles-grid">
                     <div class="principle-item reveal reveal-delay-1">
                         <h3>Прозрачность решений</h3>
-                        <p>Наша команда избирается, чтобы реформировать школьное самоуправление до реально работающего вида. </p>
+                        <p>Наша команда избирается, чтобы реформировать школьное самоуправление до реально работающего вида.</p>
                     </div>
                     <div class="principle-item reveal reveal-delay-2">
                         <h3>Реальные изменения</h3>
                         <p>Проект «Платформа» — это механизм, который упростит жизнь школы и сделает её комфортнее.</p>
                     </div>
-                    <div class="principle-item reveal reveal-delay-3">
+                    <div class="principle-item reveal reveal-delay-1">
                         <h3>Преемственность</h3>
                         <p>Мы намерены заложить фундамент, чтобы в дальнейшем проект продолжал жить, развиваться и приносить пользу школе.</p>
                     </div>
@@ -679,27 +1073,130 @@
             </div>
         </section>
 
-        <!-- Таймер -->
+        <!-- РОУД-МАПА (2 ШАГА) -->
+        <section class="roadmap-section">
+            <div class="container">
+                <div class="grid-header reveal">
+                    <div class="section-label">Как это будет работать</div>
+                    <h2 class="section-title">Роуд-мапа изменений</h2>
+                </div>
+
+                <div class="roadmap-timeline">
+                    <!-- Шаг 1: Выборы -->
+                    <div class="roadmap-step step-election reveal">
+                        <div class="step-marker">01</div>
+                        <div class="step-content">
+                            <h3>Выборы</h3>
+                            <div class="candidate-name">Избирается: София Баширова</div>
+                            <p>Честный процесс, где решает голос каждого ученика. Формирование легитимной команды.</p>
+                            <span class="election-date">Результаты 30 ноября</span>
+                        </div>
+                    </div>
+
+                    <!-- Шаг 2: Запуск (Блюр) -->
+                    <div class="roadmap-step step-future reveal reveal-delay-1">
+                        <div class="step-marker">02</div>
+                        <div class="step-content">
+                            <h3>Запуск проекта</h3>
+                            <p>Старт работы кластера, распределение зон ответственности и реализация первых инициатив.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- БЛОК ПРОГРАММЫ И САМОВЫДВИЖЕНИЯ -->
+        <section class="program-section">
+            <div class="container">
+                <div class="grid-header reveal">
+                    <div class="section-label">Документы и действия</div>
+                    <h2 class="section-title">Выборная программа</h2>
+                </div>
+
+                <div class="program-grid">
+                    <!-- Документ -->
+                    <div class="program-card reveal">
+                        <div class="program-badge">Ожидается 20 ноября</div>
+                        <h3>Полный документ предвыборной программы</h3>
+                        <p>20 ноября на этом сайте будет опубликован полный файл с нашей программой, планами и дорожной картой. Ссылка на скачивание появится в этом блоке.</p>
+                        <!-- Пока ссылка пустая, потом можно вставить <a href="ссылка_на_pdf"> -->
+                        <a href="#" class="btn-link" onclick="alert('Документ будет доступен 20 ноября!'); return false;">Скачать программу (появится 20 числа)</a>
+                    </div>
+
+                    <!-- Самовыдвижение -->
+                    <div class="program-card reveal reveal-delay-1">
+                        <div class="program-badge">Открытый парламент</div>
+                        <h3>Хотите выдвинуться?</h3>
+                        <p>Мы поддерживаем инициативных учеников! Если вы хотите предложить свою кандидатуру в парламент от блока «Платформа», у вас есть возможность самовыдвижения.</p>
+                        <p>Для этого достаточно написать нам на почту с кратким описанием вашей идеи.</p>
+                        <a href="mailto:platform.novo@inbox.ru?subject=Самовыдвижение в парламент" class="btn-outline">Написать на почту</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- БЛОК СТРУКТУРЫ (КЛАСТЕР) -->
+        <section class="structure-section">
+            <div class="container">
+                <div class="grid-header reveal">
+                    <div class="section-label">Поток идей и документов</div>
+                    <h2 class="section-title">Работающий Кластер</h2>
+                </div>
+
+                <div class="structure-layout">
+                    <!-- Текст -->
+                    <div class="structure-text reveal">
+                        <h3>Сектора передают инициативы через Кластер</h3>
+                        <p>Мы отходим от формата «один президент». Наша модель — это <strong>Кластер</strong>, который собирает и фильтрует документы и идеи от секторов.</p>
+                        <p>Этот поток позволяет избежать бюрократии и напрямую доносить суть до администрации.</p>
+                        
+                        <ul>
+                            <li>Сектор коммуникаций (диалог и защита)</li>
+                            <li>Сектор проектов (ивенты и цифра)</li>
+                            <li>Сектор исполнения (контроль задач)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Исправленная визуализация схемы -->
+                    <div class="structure-visual reveal" id="clusterDiagram">
+                        <!-- SVG Линии (рисуются поверх сетки) -->
+                        <svg class="lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <!-- Линии от секторов к кластеру -->
+                            <path class="line-path" d="M 15 25 L 45 50" />
+                            <path class="line-path" d="M 15 50 L 45 50" />
+                            <path class="line-path" d="M 15 75 L 45 50" />
+                            <!-- Линия от кластера к администрации -->
+                            <path class="line-path" d="M 55 50 L 85 50" />
+                        </svg>
+
+                        <!-- Левая колонка (Сектора) -->
+                        <div class="flow-col-sectors">
+                            <div class="box-sector">Сектор 1</div>
+                            <div class="box-sector">Сектор 2</div>
+                            <div class="box-sector">Сектор 3</div>
+                        </div>
+
+                        <!-- Центр (Кластер) -->
+                        <div class="flow-col-cluster">
+                            <div class="box-cluster">КЛАСТЕР</div>
+                        </div>
+
+                        <!-- Правая колонка (Администрация) -->
+                        <div class="flow-col-admin">
+                            <div class="box-admin">Администрация</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ТАЙМЕР (ОДИН БЛОК) -->
         <section class="timer-section">
             <div class="container reveal">
-                <div class="timer-header">До открытия Роуд-мапы и запуска проекта</div>
-                <div class="timer-grid" id="countdown">
-                    <div class="timer-box">
-                        <div class="timer-value" id="days">00</div>
-                        <div class="timer-label">Дней</div>
-                    </div>
-                    <div class="timer-box">
-                        <div class="timer-value" id="hours">00</div>
-                        <div class="timer-label">Часов</div>
-                    </div>
-                    <div class="timer-box">
-                        <div class="timer-value" id="minutes">00</div>
-                        <div class="timer-label">Минут</div>
-                    </div>
-                    <div class="timer-box">
-                        <div class="timer-value" id="seconds">00</div>
-                        <div class="timer-label">Секунд</div>
-                    </div>
+                <div class="timer-wrapper">
+                    <div class="timer-header">До примерного оглашения результатов выборов</div>
+                    <div class="timer-value-main" id="days-timer">00</div>
+                    <div class="timer-label">Дней</div>
                 </div>
             </div>
         </section>
@@ -749,7 +1246,6 @@
                             Намерены изменить школьное самоуправление до работающего вида.
                             <ul>
                                 <li>Четкое распределение обязанностей</li>
-                                <li></li>
                                 <li>Создание работающей системы на годы вперед</li>
                             </ul>
                         </div>
@@ -770,12 +1266,10 @@
                     <div class="team-card reveal reveal-delay-1">
                         <h3 class="team-name">Баширова София</h3>
                         <span class="team-role">Лидер проекта</span>
-                        <p class="team-quote"></p>
                     </div>
                     <div class="team-card reveal reveal-delay-2">
                         <h3 class="team-name">Айдарбеков Тамерлан</h3>
                         <span class="team-role">Лидер проекта</span>
-                        <p class="team-quote"></p>
                     </div>
                 </div>
             </div>
@@ -850,37 +1344,77 @@
                 
                 setTimeout(() => {
                     mainContent.classList.add("visible");
+                    startTypewriter();
                 }, 300);
             }, 5500); 
 
-            // === 2. ЛОГИКА ТАЙМЕРА (До 10 Ноября 2026) ===
-            const targetDate = new Date("November 10, 2026 00:00:00").getTime();
+            // === 2. ЭФФЕКТ ПЕЧАТНОЙ МАШИНКИ ===
+            const typewriterElement = document.getElementById("typewriter-text");
+            const phrases = [
+                "Создаем реально работающий парламент.",
+                "Реализация интересных и нужных проектов.",
+                "Создание коммуникации с учащимися и администрацией.",
+                "Защита от травли.",
+                "Реализация возможностей."
+            ];
+            let phraseIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let typeSpeed = 50;
+
+            function startTypewriter() {
+                if (!typewriterElement) return;
+                type();
+            }
+
+            function type() {
+                const currentPhrase = phrases[phraseIndex];
+
+                if (isDeleting) {
+                    typewriterElement.textContent = currentPhrase.substring(0, charIndex - 1);
+                    charIndex--;
+                    typeSpeed = 25;
+                } else {
+                    typewriterElement.textContent = currentPhrase.substring(0, charIndex + 1);
+                    charIndex++;
+                    typeSpeed = 50;
+                }
+
+                if (!isDeleting && charIndex === currentPhrase.length) {
+                    typeSpeed = 2500;
+                    isDeleting = true;
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                    typeSpeed = 500;
+                }
+
+                setTimeout(type, typeSpeed);
+            }
+
+            // === 3. ЛОГИКА ТАЙМЕРА (Только дни до 30 Ноября) ===
+            const targetDate = new Date("November 30, 2026 23:59:59").getTime();
 
             const updateTimer = () => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
 
                 if (distance < 0) {
-                    document.getElementById("countdown").innerHTML = "<h3 style='color: var(--navy); font-size: 2rem; font-family: var(--font-heading);'>Проект запущен! Роуд-мапа открыта!</h3>";
+                    document.getElementById("days-timer").innerText = "0";
+                    document.querySelector(".timer-label").innerText = "Результаты объявлены!";
                     return;
                 }
 
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById("days").innerText = days < 10 ? "0" + days : days;
-                document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
-                document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
-                document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+                document.getElementById("days-timer").innerText = days < 10 ? "0" + days : days;
             };
 
             setInterval(updateTimer, 1000);
             updateTimer();
 
-            // === 3. АНИМАЦИИ ПРИ СКРОЛЛЕ ===
+            // === 4. АНИМАЦИИ ПРИ СКРОЛЛЕ ===
             const revealElements = document.querySelectorAll('.reveal');
+            const clusterDiagram = document.getElementById('clusterDiagram');
 
             const revealOptions = {
                 threshold: 0.1,
@@ -899,6 +1433,23 @@
             revealElements.forEach(el => {
                 revealObserver.observe(el);
             });
+
+            // Анимация схемы Кластера (рисуем линии)
+            const diagramObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Даем небольшую задержку перед активацией линий
+                        setTimeout(() => {
+                            entry.target.classList.add('active');
+                        }, 300);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.4 }); // Срабатывает, когда 40% схемы видно
+
+            if (clusterDiagram) {
+                diagramObserver.observe(clusterDiagram);
+            }
         });
     </script>
 </body>
