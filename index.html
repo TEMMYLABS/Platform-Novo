@@ -5,43 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Проект Платформа | Выборы 2026-2027</title>
     <meta name="description" content="Создаем реально работающий парламент. Упрощаем жизнь школы.">
-    
-    <!-- Шрифты -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            /* Строгая палитра */
-            --navy: #0A1324; 
+            --navy: #0A1324;
             --navy-light: #16243D;
             --white: #FFFFFF;
             --off-white: #F8F9FA;
             --text-main: #0A1324;
             --text-muted: #5A6B85;
             --border: #E2E8F0;
-            --accent-blue: #2B5CFF; /* Цвет для подсветки */
-            
-            /* Типографика */
+            --accent-blue: #2B5CFF;
+
             --font-heading: 'Montserrat', sans-serif;
             --font-body: 'Inter', sans-serif;
-            
-            /* Очень плавные анимации */
+
             --ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
             --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
-            --transition-slow: 1s var(--ease-slow);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font-body);
@@ -52,135 +41,210 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        ::selection {
-            background: var(--navy);
-            color: var(--white);
-        }
+        body.intro-active { overflow: hidden; }
 
-        /* === ПРЕЛОАДЕР === */
-        .preloader {
+        ::selection { background: var(--navy); color: var(--white); }
+
+        /* === ИНТРО === */
+        .intro-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background-color: var(--navy);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 1.2s var(--ease-smooth), visibility 1.2s;
-        }
-
-        .preloader.hidden {
-            opacity: 0;
-            visibility: hidden;
-            transform: scale(1.05);
-        }
-
-        .brand-container {
+            inset: 0;
+            background: var(--navy);
+            color: var(--white); /* ← ГЛАВНЫЙ ФИКС: без этого «Платформа» была navy-по-navy */
             display: flex;
             flex-direction: column;
             align-items: center;
-            transform: translateY(-20px);
+            justify-content: center;
+            z-index: 9999;
+            user-select: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            padding: 24px;
+            will-change: opacity;
         }
 
-        .logo-container {
+        .intro-overlay.done { opacity: 0; visibility: hidden; }
+
+        .intro-stage {
+            position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 24px;
-            margin-bottom: 12px;
+            width: min(560px, 80vmin);
+        }
+
+        .intro-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            overflow: visible;
+        }
+
+        .stage-caption {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translate(-50%, 10px);
+            font-family: var(--font-heading);
+            font-size: clamp(0.85rem, 2.1vw, 1rem);
+            font-weight: 800;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--white);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.6s var(--ease-slow);
+            white-space: nowrap;
+        }
+        .stage-caption::before,
+        .stage-caption::after {
+            content: '';
+            display: inline-block;
+            vertical-align: middle;
+            width: 26px;
+            height: 1px;
+            background: var(--accent-blue);
+            margin: 0 14px;
+        }
+        .stage-caption.visible { opacity: 1; transform: translate(-50%, 0); }
+
+        #stageChevron {
+            transform-box: fill-box;
+            transform-origin: center;
+            transform: scale(0.9);
+            transition: opacity 0.5s ease, transform 0.7s var(--ease-slow);
+        }
+        #stageChevron.visible { transform: scale(1); }
+        #stageChevron.visible.stretch { transform: scale(1.35, 1); }
+
+        .intro-overlay .stage { opacity: 0; transition: opacity 0.5s ease; }
+        .intro-overlay .stage.visible { opacity: 1; }
+
+        .intro-overlay .edge {
+            stroke: rgba(255, 255, 255, 0.55);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-dasharray: 1 1;
+            stroke-dashoffset: 1;
+            transition: stroke-dashoffset 0.6s ease;
+            transition-delay: calc(var(--i, 0) * 0.06s);
+        }
+        .intro-overlay .stage.visible .edge { stroke-dashoffset: 0; }
+
+        .intro-overlay .node {
+            fill: var(--white);
+            opacity: 0;
+            transform-box: fill-box;
+            transform-origin: center;
+            transform: scale(0.3);
+            transition: opacity 0.4s ease, transform 0.5s var(--ease-slow);
+            transition-delay: calc(var(--i, 0) * 0.06s);
+        }
+        .intro-overlay .node.hub { fill: var(--accent-blue); }
+        .intro-overlay .stage.visible .node { opacity: 1; transform: scale(1); }
+
+        .intro-overlay .person circle,
+        .intro-overlay .person path { fill: var(--white); }
+        .intro-overlay .person {
+            opacity: 0;
+            transform-box: fill-box;
+            transform-origin: center bottom;
+            transform: scale(0.5);
+            transition: opacity 0.5s ease, transform 0.6s var(--ease-slow);
+            transition-delay: calc(var(--i, 0) * 0.12s);
+        }
+        .intro-overlay .stage.visible .person { opacity: 1; transform: scale(1); }
+
+        .directions-screen,
+        .final-screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 22px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s var(--ease-slow);
+            pointer-events: none;
+            padding: 24px;
+            text-align: center;
+        }
+        .directions-screen.visible,
+        .final-screen.visible { opacity: 1; transform: translateY(0); }
+
+        .directions-mark { width: 64px; height: 46px; fill: var(--white); }
+        .directions-title {
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            line-height: 1;
             color: var(--white);
         }
-
-        .logo-mark {
-            width: 90px;
-            height: 75px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .chevron {
-            width: 100%;
-            height: 34px;
-            fill: currentColor;
-            transform-origin: center;
-            opacity: 0;
-        }
-
-        .chevron-1 {
-            transform: translateY(20px);
-            animation: slideUpIn 1s var(--ease-slow) forwards 0.3s;
-        }
-
-        .chevron-2 {
-            transform: translateY(20px);
-            animation: slideUpIn 1s var(--ease-slow) forwards 0.5s;
-        }
-
-        .logo-text {
+        .directions-grid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+        .dir-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 22px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 6px;
             font-family: var(--font-heading);
             font-weight: 800;
-            font-size: 3.5rem;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--white);
+            background: rgba(43, 92, 255, 0.08);
+        }
+        .dir-card svg { width: 20px; height: 16px; fill: var(--accent-blue); flex-shrink: 0; }
+
+        .final-mark { width: 72px; height: 52px; fill: var(--white); }
+        .final-title {
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: clamp(2.2rem, 7vw, 3.8rem);
+            line-height: 1;
             letter-spacing: -0.03em;
-            clip-path: inset(0 100% 0 0);
-            opacity: 0;
-            animation: revealText 1.2s var(--ease-slow) forwards 0.8s;
+            color: var(--white);
         }
-
-        .rotating-text-wrapper {
-            padding-left: 114px; 
-            height: 36px; 
-            overflow: hidden; 
-            position: relative;
-            opacity: 0;
-            margin-top: -4px; 
-            animation: fadeInText 1.2s ease forwards 1.8s; 
-            width: 100%;
-        }
-
-        .rotating-list {
-            display: flex;
-            flex-direction: column;
-            transition: transform 1s var(--ease-slow);
-        }
-
-        .rotating-item {
-            height: 36px;
-            line-height: 36px;
-            font-size: 1.25rem;
+        .final-sub {
             font-family: var(--font-body);
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.5);
-            white-space: nowrap;
-            transition: filter 1s ease, opacity 1s ease;
-            letter-spacing: 0.02em;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.55);
         }
 
-        .rotating-item.blur-out { filter: blur(10px); opacity: 0; transform: translateX(-10px); }
-        .rotating-item.blur-in { filter: blur(0); opacity: 1; transform: translateX(0); }
-
-        @keyframes slideUpIn { to { opacity: 1; transform: translateY(0); } }
-        @keyframes revealText { to { clip-path: inset(0 0 0 0); opacity: 1; } }
-        @keyframes fadeInText { to { opacity: 1; } }
+        .intro-skip {
+            position: absolute;
+            bottom: 28px;
+            right: 28px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.6);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .intro-skip:hover { border-color: rgba(255, 255, 255, 0.6); color: var(--white); }
 
         /* === ОСНОВНОЙ САЙТ === */
-        .main-content {
-            opacity: 0;
-            transition: opacity 1.5s ease;
-        }
-        .main-content.visible {
-            opacity: 1;
-        }
+        .main-content { opacity: 0; transition: opacity 1.5s ease; }
+        .main-content.visible { opacity: 1; }
 
-        .container {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
+        .container { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
 
-        /* Навигация */
         header {
             padding: 40px 0;
             position: absolute;
@@ -189,11 +253,7 @@
             z-index: 100;
         }
 
-        .nav-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
 
         .nav-logo {
             display: flex;
@@ -206,12 +266,7 @@
             text-decoration: none;
             letter-spacing: -0.02em;
         }
-
-        .nav-logo svg {
-            width: 26px;
-            height: 22px;
-            fill: var(--white);
-        }
+        .nav-logo svg { width: 26px; height: 22px; fill: var(--white); }
 
         .nav-email {
             color: var(--white);
@@ -224,7 +279,6 @@
         }
         .nav-email:hover { opacity: 1; }
 
-        /* Hero Секция */
         .hero {
             background-color: var(--navy);
             color: var(--white);
@@ -233,11 +287,7 @@
             display: flex;
             align-items: flex-end;
         }
-
-        .hero-content {
-            max-width: 1100px;
-            width: 100%;
-        }
+        .hero-content { max-width: 1100px; width: 100%; }
 
         .hero-tag {
             display: inline-flex;
@@ -250,15 +300,8 @@
             color: rgba(255,255,255,0.6);
             margin-bottom: 30px;
         }
+        .hero-tag::before { content: ''; width: 40px; height: 1px; background: rgba(255,255,255,0.6); }
 
-        .hero-tag::before {
-            content: '';
-            width: 40px;
-            height: 1px;
-            background: rgba(255,255,255,0.6);
-        }
-
-        /* Исправленный заголовок с машинкой */
         .hero h1 {
             font-family: var(--font-heading);
             font-size: clamp(2.5rem, 5.5vw, 5rem);
@@ -268,7 +311,7 @@
             margin-bottom: 30px;
             min-height: 2.3em;
             display: block;
-            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .cursor {
@@ -281,11 +324,7 @@
             vertical-align: text-bottom;
             margin-bottom: 0.1em;
         }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         .hero p {
             font-size: 1.3rem;
@@ -296,8 +335,8 @@
             opacity: 0;
             animation: fadeInText 1s ease forwards 1s;
         }
+        @keyframes fadeInText { to { opacity: 1; } }
 
-        /* Яркая подсветка ключевых слов */
         .hero p .highlight {
             color: var(--white);
             font-weight: 600;
@@ -307,81 +346,40 @@
             border-radius: 2px 2px 0 0;
         }
 
-        /* Секция Принципы (Миссия) */
-        .principles-section {
-            padding: 140px 0;
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border);
+        /* Оптимизация: браузер не рендерит секции ниже hero, пока они не подойдут */
+        .principles-section,
+        .roadmap-section,
+        .program-section,
+        .structure-section,
+        .pillars-section,
+        .team-section,
+        footer {
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 800px;
         }
 
-        .grid-header {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 40px;
-            margin-bottom: 80px;
-        }
+        .principles-section { padding: 140px 0; background-color: var(--white); border-bottom: 1px solid var(--border); }
+        .grid-header { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; margin-bottom: 80px; }
+        .section-label { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+        .section-title { font-family: var(--font-heading); font-size: 2.8rem; font-weight: 800; color: var(--navy); letter-spacing: -0.03em; line-height: 1.2; }
 
-        .section-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-        }
+        .principles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
+        .principle-item { border-top: 1px solid var(--border); padding-top: 30px; }
+        .principle-item h3 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: var(--navy); margin-bottom: 20px; }
+        .principle-item p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.8; }
 
-        .section-title {
-            font-family: var(--font-heading);
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: var(--navy);
-            letter-spacing: -0.03em;
-            line-height: 1.2;
-        }
-
-        .principles-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 60px;
-        }
-
-        .principle-item {
-            border-top: 1px solid var(--border);
-            padding-top: 30px;
-        }
-
-        .principle-item h3 {
-            font-family: var(--font-heading);
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--navy);
-            margin-bottom: 20px;
-        }
-
-        .principle-item p {
-            font-size: 1.05rem;
-            color: var(--text-muted);
-            line-height: 1.8;
-        }
-
-        /* === РОУД-МАПА (2 ШАГА) === */
-        .roadmap-section {
-            padding: 140px 0;
-            background-color: var(--off-white);
-            border-bottom: 1px solid var(--border);
-            overflow: hidden;
-        }
-
+        /* === РОУД-МАПА: 4 ШАГА === */
+        .roadmap-section { padding: 140px 0; background-color: var(--off-white); border-bottom: 1px solid var(--border); overflow: hidden; }
         .roadmap-timeline {
             position: relative;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 60px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
             margin-top: 80px;
-            max-width: 900px;
+            max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
         }
-
         .roadmap-step {
             position: relative;
             z-index: 1;
@@ -391,10 +389,9 @@
             text-align: center;
             transition: all 0.6s var(--ease-smooth);
         }
-
         .step-marker {
-            width: 80px;
-            height: 80px;
+            width: 68px;
+            height: 68px;
             background: var(--white);
             border: 2px solid var(--border);
             border-radius: 50%;
@@ -402,104 +399,83 @@
             align-items: center;
             justify-content: center;
             font-family: var(--font-heading);
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--navy);
-            margin-bottom: 30px;
+            margin-bottom: 18px;
             transition: all 0.4s var(--ease-smooth);
         }
-
         .step-content {
             background: var(--white);
-            padding: 40px 30px;
+            padding: 28px 20px;
             border-radius: 8px;
             border: 1px solid var(--border);
             box-shadow: 0 10px 30px rgba(0,0,0,0.02);
             width: 100%;
             transition: all 0.6s var(--ease-smooth);
         }
+        .step-content h3 { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--navy); margin-bottom: 12px; line-height: 1.3; }
+        .step-content p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
 
-        .step-content h3 {
-            font-family: var(--font-heading);
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--navy);
-            margin-bottom: 15px;
-        }
-
-        .step-content p {
-            font-size: 1rem;
-            color: var(--text-muted);
-        }
-
-        /* Шаг 1 (Выборы) - Активный */
-        .step-election .step-marker {
+        .step-campaign .step-marker {
             border-color: var(--navy);
             background: var(--navy);
             color: var(--white);
             box-shadow: 0 0 0 8px rgba(10, 19, 36, 0.1);
         }
-
-        .step-election .step-content {
+        .step-campaign .step-content {
             background: var(--navy);
             color: var(--white);
             border-color: var(--navy);
             box-shadow: 0 20px 40px rgba(10, 19, 36, 0.15);
         }
-
-        .step-election .step-content h3 { color: var(--white); font-size: 1.6rem; }
-        .step-election .step-content p { color: rgba(255,255,255,0.7); margin-bottom: 20px; }
+        .step-campaign .step-content h3 { color: var(--white); font-size: 1.25rem; }
+        .step-campaign .step-content p { color: rgba(255,255,255,0.7); }
 
         .candidate-name {
-            display: inline-block;
-            font-family: var(--font-heading);
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--white);
-            background: rgba(43, 92, 255, 0.3);
-            padding: 8px 16px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border: 1px solid var(--accent-blue);
-        }
-
-        .election-date {
             display: block;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--accent-blue);
-            margin-top: 15px;
+            font-family: var(--font-heading);
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--navy);
+            background: rgba(43, 92, 255, 0.1);
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin: 0 0 8px 0;
+            border: 1px solid rgba(43, 92, 255, 0.25);
+            line-height: 1.4;
+            text-align: left;
+        }
+        .candidate-name:last-child { margin-bottom: 0; }
+
+        .step-badge {
+            display: inline-block;
+            font-family: var(--font-body);
+            font-size: 0.68rem;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 5px 11px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        .step-badge.soon {
+            background: rgba(43, 92, 255, 0.1);
+            color: var(--accent-blue);
+            border: 1px solid rgba(43, 92, 255, 0.25);
         }
 
-        /* Шаг 2 (Запуск) - Блюр */
         .step-future .step-content,
         .step-future .step-marker {
-            opacity: 0.6;
+            opacity: 0.55;
             filter: blur(2px);
             transition: all 0.6s var(--ease-smooth);
         }
-
         .step-future:hover .step-content,
-        .step-future:hover .step-marker {
-            opacity: 1;
-            filter: blur(0);
-        }
+        .step-future:hover .step-marker { opacity: 1; filter: blur(0); }
 
-        /* === БЛОК ПРОГРАММЫ И САМОВЫДВИЖЕНИЯ === */
-        .program-section {
-            padding: 120px 0;
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .program-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
+        .program-section { padding: 120px 0; background-color: var(--white); border-bottom: 1px solid var(--border); }
+        .program-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
         .program-card {
             background: var(--off-white);
             padding: 50px;
@@ -507,35 +483,25 @@
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-
         .program-badge {
             display: inline-block;
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--navy);
             background: rgba(10, 19, 36, 0.05);
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 4px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            align-self: flex-start;
         }
-
-        .program-card h3 {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--navy);
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .program-card p {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            margin-bottom: 30px;
-        }
+        .program-card h3 { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--navy); margin-bottom: 20px; line-height: 1.2; }
+        .program-card p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 20px; }
+        .program-card .btn-link { margin-top: auto; }
 
         .btn-link {
             display: inline-flex;
@@ -551,10 +517,7 @@
             width: 100%;
             text-align: center;
         }
-
-        .btn-link:hover {
-            background: var(--accent-blue);
-        }
+        .btn-link:hover { background: var(--accent-blue); }
 
         .btn-outline {
             background: transparent;
@@ -568,65 +531,18 @@
             font-weight: 600;
             border-radius: 6px;
             transition: all 0.3s ease;
+            margin-top: auto;
         }
-        
-        .btn-outline:hover {
-            background: var(--navy);
-            color: var(--white);
-        }
+        .btn-outline:hover { background: var(--navy); color: var(--white); }
 
-        /* === БЛОК СТРУКТУРЫ (КЛАСТЕР) - ИСПРАВЛЕН === */
-        .structure-section {
-            padding: 140px 0;
-            background-color: var(--off-white);
-        }
+        .structure-section { padding: 140px 0; background-color: var(--off-white); }
+        .structure-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center; margin-top: 60px; }
+        .structure-text h3 { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--navy); margin-bottom: 25px; line-height: 1.2; }
+        .structure-text p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px; }
+        .structure-text ul { list-style: none; margin-top: 30px; }
+        .structure-text li { position: relative; padding-left: 30px; margin-bottom: 15px; font-size: 1rem; font-weight: 500; color: var(--navy); }
+        .structure-text li::before { content: '→'; position: absolute; left: 0; color: var(--navy); font-weight: 800; }
 
-        .structure-layout {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 60px;
-            align-items: center;
-            margin-top: 60px;
-        }
-
-        .structure-text h3 {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--navy);
-            margin-bottom: 25px;
-            line-height: 1.2;
-        }
-
-        .structure-text p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .structure-text ul {
-            list-style: none;
-            margin-top: 30px;
-        }
-
-        .structure-text li {
-            position: relative;
-            padding-left: 30px;
-            margin-bottom: 15px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--navy);
-        }
-
-        .structure-text li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: var(--navy);
-            font-weight: 800;
-        }
-
-        /* Визуализация схемы (Исправленная сетка) */
         .structure-visual {
             position: relative;
             height: 350px;
@@ -641,48 +557,17 @@
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.02);
         }
-
-        /* SVG Линии */
-        .lines-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
+        .lines-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         .line-path {
             stroke: var(--border);
             stroke-width: 3;
             fill: none;
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
             transition: stroke-dashoffset 1.5s var(--ease-smooth) 0.5s, stroke 0.4s ease;
         }
+        .flow-col-sectors { display: flex; flex-direction: column; gap: 20px; z-index: 2; }
+        .flow-col-cluster { display: flex; justify-content: center; z-index: 2; }
+        .flow-col-admin { display: flex; justify-content: center; z-index: 2; }
 
-        /* Колонки */
-        .flow-col-sectors {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 2;
-        }
-
-        .flow-col-cluster {
-            display: flex;
-            justify-content: center;
-            z-index: 2;
-        }
-
-        .flow-col-admin {
-            display: flex;
-            justify-content: center;
-            z-index: 2;
-        }
-
-        /* Блоки */
         .box-sector {
             background: var(--off-white);
             border: 1px solid var(--border);
@@ -696,7 +581,6 @@
             transform: translateX(-30px);
             transition: all 0.6s var(--ease-smooth);
         }
-
         .box-cluster {
             background: var(--navy);
             color: var(--white);
@@ -710,7 +594,6 @@
             transform: scale(0.8);
             transition: all 0.6s var(--ease-smooth) 0.4s;
         }
-
         .box-admin {
             background: var(--white);
             border: 2px solid var(--navy);
@@ -724,78 +607,13 @@
             transform: translateX(30px);
             transition: all 0.6s var(--ease-smooth) 0.8s;
         }
-
-        /* Активация схемы */
         .structure-visual.active .box-sector,
         .structure-visual.active .box-cluster,
-        .structure-visual.active .box-admin {
-            opacity: 1;
-            transform: translate(0) scale(1);
-        }
+        .structure-visual.active .box-admin { opacity: 1; transform: translate(0) scale(1); }
+        .structure-visual.active .line-path { stroke: var(--navy); }
 
-        .structure-visual.active .line-path {
-            stroke-dashoffset: 0;
-            stroke: var(--navy); /* Линии становятся темными */
-        }
-
-        /* === ТАЙМЕР (ОДИН БЛОК) === */
-        .timer-section {
-            padding: 100px 0;
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .timer-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background: var(--off-white);
-            padding: 60px 40px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-        }
-
-        .timer-header {
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .timer-value-main {
-            font-family: var(--font-heading);
-            font-size: clamp(5rem, 10vw, 8rem);
-            font-weight: 800;
-            color: var(--navy);
-            line-height: 1;
-            letter-spacing: -0.04em;
-        }
-
-        .timer-label {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--navy);
-            margin-top: 15px;
-        }
-
-        /* Направления */
-        .pillars-section {
-            padding: 160px 0;
-            background-color: var(--white);
-        }
-
-        .pillars-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-
+        .pillars-section { padding: 160px 0; background-color: var(--white); }
+        .pillars-list { display: flex; flex-direction: column; gap: 0; }
         .pillar-row {
             display: grid;
             grid-template-columns: 80px 1fr 1fr;
@@ -804,165 +622,54 @@
             border-bottom: 1px solid var(--border);
             transition: background-color 0.4s var(--ease-smooth), padding-left 0.4s var(--ease-smooth);
         }
-
-        .pillar-row:hover {
-            background-color: var(--off-white);
-            padding-left: 20px;
-            border-radius: 8px;
-        }
-
+        .pillar-row:hover { background-color: var(--off-white); padding-left: 20px; border-radius: 8px; }
         .pillar-row:first-child { border-top: 1px solid var(--border); }
-
-        .pillar-num {
-            font-family: var(--font-heading);
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--navy);
-            padding-top: 5px;
-        }
-
-        .pillar-title {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--navy);
-            letter-spacing: -0.02em;
-        }
-
-        .pillar-desc {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            line-height: 1.8;
-        }
-
-        .pillar-desc ul {
-            list-style: none;
-            margin-top: 20px;
-        }
-
-        .pillar-desc li {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 10px;
-            font-size: 1rem;
-            font-weight: 500;
+        .pillar-num { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; color: var(--navy); padding-top: 5px; }
+        .pillar-title { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
+        .pillar-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.8; }
+        .pillar-curator {
+            display: block;
+            margin-top: 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
             color: var(--navy);
         }
+        .pillar-desc ul { list-style: none; margin-top: 20px; }
+        .pillar-desc li { position: relative; padding-left: 20px; margin-bottom: 10px; font-size: 1rem; font-weight: 500; color: var(--navy); }
+        .pillar-desc li::before { content: '—'; position: absolute; left: 0; color: var(--text-muted); }
 
-        .pillar-desc li::before {
-            content: '—';
-            position: absolute;
-            left: 0;
-            color: var(--text-muted);
-        }
-
-        /* Команда */
-        .team-section {
-            padding: 140px 0;
-            background-color: var(--navy);
-            color: var(--white);
-        }
-
+        .team-section { padding: 140px 0; background-color: var(--navy); color: var(--white); }
         .team-section .section-title { color: var(--white); }
         .team-section .section-label { color: rgba(255,255,255,0.5); }
+        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 80px; }
+        .team-card { padding: 50px; border: 1px solid rgba(255,255,255,0.1); transition: border-color 0.5s var(--ease-smooth), background-color 0.5s var(--ease-smooth); }
+        .team-card:hover { border-color: rgba(255,255,255,0.4); background-color: rgba(255,255,255,0.02); }
+        .team-name { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+        .team-role { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 30px; display: block; }
 
-        .team-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            margin-top: 80px;
-        }
-
-        .team-card {
-            padding: 50px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: border-color 0.5s var(--ease-smooth), background-color 0.5s var(--ease-smooth);
-        }
-
-        .team-card:hover {
-            border-color: rgba(255,255,255,0.4);
-            background-color: rgba(255,255,255,0.02);
-        }
-
-        .team-name {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .team-role {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: rgba(255,255,255,0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 30px;
-            display: block;
-        }
-
-        /* Футер */
-        footer {
-            background-color: #060B14;
-            color: var(--white);
-            padding: 120px 0;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .footer-title {
-            font-family: var(--font-heading);
-            font-size: clamp(2.5rem, 4vw, 3.5rem);
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            max-width: 600px;
-            line-height: 1.1;
-        }
-
-        .footer-email {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--white);
-            text-decoration: none;
-            position: relative;
-            padding-bottom: 8px;
-            transition: color 0.4s ease;
-        }
-
-        .footer-email::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: rgba(255,255,255,0.2);
-            transition: background 0.4s var(--ease-smooth);
-        }
-
+        footer { background-color: #060B14; color: var(--white); padding: 120px 0; }
+        .footer-content { display: flex; justify-content: space-between; align-items: flex-end; }
+        .footer-title { font-family: var(--font-heading); font-size: clamp(2.5rem, 4vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; max-width: 600px; line-height: 1.1; }
+        .footer-email { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: var(--white); text-decoration: none; position: relative; padding-bottom: 8px; transition: color 0.4s ease; }
+        .footer-email::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.2); transition: background 0.4s var(--ease-smooth); }
         .footer-email:hover::after { background: var(--white); }
 
-        /* === АНИМАЦИИ ПОЯВЛЕНИЯ === */
         .reveal {
             opacity: 0;
             transform: translateY(50px);
             transition: opacity 1.2s var(--ease-slow), transform 1.2s var(--ease-slow);
+            will-change: opacity, transform;
         }
-        
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        .reveal.active { opacity: 1; transform: translateY(0); will-change: auto; }
         .reveal-delay-1 { transition-delay: 0.15s; }
         .reveal-delay-2 { transition-delay: 0.3s; }
 
-        /* === АДАПТИВНОСТЬ === */
+        @media (max-width: 1100px) {
+            .roadmap-timeline { grid-template-columns: repeat(2, 1fr); gap: 32px; max-width: 700px; }
+        }
+
         @media (max-width: 1024px) {
             .grid-header { grid-template-columns: 1fr; gap: 20px; }
             .principles-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -970,61 +677,158 @@
             .pillar-num { display: none; }
             .team-grid { grid-template-columns: 1fr; }
             .footer-content { flex-direction: column; align-items: flex-start; gap: 40px; }
-            
-            .roadmap-timeline { grid-template-columns: 1fr; gap: 40px; max-width: 500px; }
             .structure-layout { grid-template-columns: 1fr; gap: 50px; }
             .program-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
             .container { padding: 0 24px; }
-            .hero h1 { font-size: 2.2rem; min-height: 3em; }
+            .hero h1 { font-size: 2.2rem; min-height: 3.5em; }
             .footer-email { font-size: 1.4rem; }
-            
-            /* Прелоадер на телефонах */
-            .logo-container { flex-direction: column; gap: 5px; }
-            .logo-mark { width: 60px; height: 45px; }
-            .chevron { height: 22px; }
-            .logo-text { font-size: 2.2rem; }
-            .rotating-text-wrapper { padding-left: 0; text-align: center; }
-            .rotating-item { text-align: center; }
-            
-            .structure-visual { 
-                grid-template-columns: 80px 1fr 100px; 
-                padding: 20px; 
-                height: 300px;
-            }
+
+            .roadmap-timeline { grid-template-columns: 1fr; gap: 32px; max-width: 400px; }
+
+            .structure-visual { grid-template-columns: 80px 1fr 100px; padding: 20px; height: 300px; }
             .box-sector, .box-cluster, .box-admin { font-size: 0.7rem; padding: 10px 5px; }
             .program-card { padding: 30px; }
+            .intro-skip { bottom: 16px; right: 16px; padding: 8px 14px; font-size: 0.7rem; }
+        }
+
+        @media (max-width: 420px) {
+            .hero h1 { min-height: 4.6em; }
+            .stage-caption { letter-spacing: 0.2em; }
+            .stage-caption::before, .stage-caption::after { width: 18px; margin: 0 10px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+            .reveal { opacity: 1 !important; transform: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- === ПРЕЛОАДЕР === -->
-    <div class="preloader" id="preloader">
-        <div class="brand-container">
-            <div class="logo-container">
-                <svg class="logo-mark" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
-                    <path class="chevron chevron-1" d="M12 80 L60 52 L108 80 L108 65 L60 37 L12 65 Z" />
-                    <path class="chevron chevron-2" d="M12 52 L60 24 L108 52 L108 37 L60 9 L12 37 Z" />
-                </svg>
-                <div class="logo-text">Платформа</div>
-            </div>
-            <div class="rotating-text-wrapper">
-                <div class="rotating-list" id="rotatingList">
-                    <div class="rotating-item">коммуникация</div>
-                    <div class="rotating-item">проекты</div>
-                    <div class="rotating-item">школьное самоуправление</div>
+    <noscript>
+        <style>
+            .intro-overlay { display: none !important; }
+            .main-content { opacity: 1 !important; }
+            .reveal { opacity: 1 !important; transform: none !important; }
+            #typewriter-text::before { content: "Создаем реально работающий парламент."; }
+            .cursor { display: none; }
+            .structure-visual .box-sector,
+            .structure-visual .box-cluster,
+            .structure-visual .box-admin { opacity: 1 !important; transform: none !important; }
+            .structure-visual .line-path { stroke: var(--navy) !important; }
+        </style>
+    </noscript>
+
+    <!-- === ИНТРО === -->
+    <div class="intro-overlay" id="introOverlay">
+
+        <div class="intro-stage">
+
+            <svg class="intro-svg" viewBox="30 30 340 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+
+                <g class="stage" id="stageChevron">
+                    <path fill="currentColor" d="M 60 200 L 200 120 L 340 200 L 340 160 L 200 80 L 60 160 Z" />
+                    <path fill="currentColor" d="M 60 300 L 200 220 L 340 300 L 340 260 L 200 180 L 60 260 Z" />
+                </g>
+
+                <g class="stage" id="stageComms">
+                    <line class="edge" style="--i: 0"  pathLength="1" x1="330" y1="200" x2="200" y2="200" />
+                    <line class="edge" style="--i: 1"  pathLength="1" x1="292" y1="108" x2="200" y2="200" />
+                    <line class="edge" style="--i: 2"  pathLength="1" x1="200" y1="70"  x2="200" y2="200" />
+                    <line class="edge" style="--i: 3"  pathLength="1" x1="108" y1="108" x2="200" y2="200" />
+                    <line class="edge" style="--i: 4"  pathLength="1" x1="70"  y1="200" x2="200" y2="200" />
+                    <line class="edge" style="--i: 5"  pathLength="1" x1="108" y1="292" x2="200" y2="200" />
+                    <line class="edge" style="--i: 6"  pathLength="1" x1="200" y1="330" x2="200" y2="200" />
+                    <line class="edge" style="--i: 7"  pathLength="1" x1="292" y1="292" x2="200" y2="200" />
+
+                    <line class="edge" style="--i: 8"  pathLength="1" x1="330" y1="200" x2="292" y2="108" />
+                    <line class="edge" style="--i: 9"  pathLength="1" x1="292" y1="108" x2="200" y2="70"  />
+                    <line class="edge" style="--i: 10" pathLength="1" x1="200" y1="70"  x2="108" y2="108" />
+                    <line class="edge" style="--i: 11" pathLength="1" x1="108" y1="108" x2="70"  y2="200" />
+                    <line class="edge" style="--i: 12" pathLength="1" x1="70"  y1="200" x2="108" y2="292" />
+                    <line class="edge" style="--i: 13" pathLength="1" x1="108" y1="292" x2="200" y2="330" />
+                    <line class="edge" style="--i: 14" pathLength="1" x1="200" y1="330" x2="292" y2="292" />
+                    <line class="edge" style="--i: 15" pathLength="1" x1="292" y1="292" x2="330" y2="200" />
+
+                    <circle class="node"     style="--i: 0" cx="330" cy="200" r="11" />
+                    <circle class="node"     style="--i: 1" cx="292" cy="108" r="11" />
+                    <circle class="node"     style="--i: 2" cx="200" cy="70"  r="11" />
+                    <circle class="node"     style="--i: 3" cx="108" cy="108" r="11" />
+                    <circle class="node"     style="--i: 4" cx="70"  cy="200" r="11" />
+                    <circle class="node"     style="--i: 5" cx="108" cy="292" r="11" />
+                    <circle class="node"     style="--i: 6" cx="200" cy="330" r="11" />
+                    <circle class="node"     style="--i: 7" cx="292" cy="292" r="11" />
+                    <circle class="node hub" style="--i: 8" cx="200" cy="200" r="16" />
+                </g>
+
+                <g class="stage" id="stagePeople">
+                    <g transform="translate(95, 245) scale(1.1)">
+                        <g class="person" style="--i: 0">
+                            <circle cx="0" cy="-30" r="20" />
+                            <path d="M -35 55 Q -35 0 0 0 Q 35 0 35 55 Z" />
+                        </g>
+                    </g>
+                    <g transform="translate(200, 215) scale(1.4)">
+                        <g class="person" style="--i: 1">
+                            <circle cx="0" cy="-30" r="20" />
+                            <path d="M -35 55 Q -35 0 0 0 Q 35 0 35 55 Z" />
+                        </g>
+                    </g>
+                    <g transform="translate(305, 245) scale(1.1)">
+                        <g class="person" style="--i: 2">
+                            <circle cx="0" cy="-30" r="20" />
+                            <path d="M -35 55 Q -35 0 0 0 Q 35 0 35 55 Z" />
+                        </g>
+                    </g>
+                </g>
+
+            </svg>
+
+            <div class="stage-caption" id="captionComms">Коммуникация</div>
+            <div class="stage-caption" id="captionPeople">Проекты</div>
+
+        </div>
+
+        <div class="directions-screen" id="directionsScreen">
+            <svg class="directions-mark" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M12 80 L60 52 L108 80 L108 65 L60 37 L12 65 Z" />
+                <path d="M12 52 L60 24 L108 52 L108 37 L60 9 L12 37 Z" />
+            </svg>
+            <h2 class="directions-title">Направления</h2>
+            <div class="directions-grid">
+                <div class="dir-card">
+                    <svg viewBox="0 0 120 100" aria-hidden="true"><path d="M12 80 L60 52 L108 80 L108 65 L60 37 L12 65 Z" /></svg>
+                    Коммуникация
+                </div>
+                <div class="dir-card">
+                    <svg viewBox="0 0 120 100" aria-hidden="true"><path d="M12 80 L60 52 L108 80 L108 65 L60 37 L12 65 Z" /></svg>
+                    Проекты
                 </div>
             </div>
         </div>
+
+        <div class="final-screen" id="finalScreen">
+            <svg class="final-mark" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M12 80 L60 52 L108 80 L108 65 L60 37 L12 65 Z" />
+                <path d="M12 52 L60 24 L108 52 L108 37 L60 9 L12 37 Z" />
+            </svg>
+            <div class="final-title">ПЛАТФОРМА</div>
+            <div class="final-sub">Выборы 2026 — 2027</div>
+        </div>
+
+        <button class="intro-skip" id="introSkip" type="button">Пропустить</button>
+
     </div>
 
     <!-- === ОСНОВНОЙ САЙТ === -->
     <div class="main-content" id="mainContent">
-        
-        <!-- Навигация -->
+
         <header>
             <div class="container nav-inner">
                 <a href="#" class="nav-logo">
@@ -1035,7 +839,6 @@
             </div>
         </header>
 
-        <!-- Hero -->
         <section class="hero">
             <div class="container">
                 <div class="hero-content">
@@ -1043,19 +846,18 @@
                     <h1>
                         <span id="typewriter-text"></span><span class="cursor"></span>
                     </h1>
-                    <p>Наша цель — <span class="highlight">упростить жизнь школы</span> и внести важные изменения. На выборах от проекта «Платформа» избирается <span class="highlight">София Баширова</span>. Это <span class="highlight">четкая система действий</span>, где <span class="highlight">каждый голос имеет вес</span>.</p>
+                    <p>Наша цель — <span class="highlight">упростить жизнь школы</span> и внести важные изменения. На выборах от проекта «Платформа» избираются <span class="highlight">София Баширова</span> (направление «Проекты») и <span class="highlight">Тамерлан Айдарбеков</span> (направление «Коммуникация»). Это <span class="highlight">четкая система действий</span>, где <span class="highlight">каждый голос имеет вес</span>.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Принципы (Миссия) -->
         <section class="principles-section">
             <div class="container">
                 <div class="grid-header reveal">
                     <div class="section-label"></div>
                     <h2 class="section-title">Почему мы это делаем?</h2>
                 </div>
-                
+
                 <div class="principles-grid">
                     <div class="principle-item reveal reveal-delay-1">
                         <h3>Прозрачность решений</h3>
@@ -1073,7 +875,6 @@
             </div>
         </section>
 
-        <!-- РОУД-МАПА (2 ШАГА) -->
         <section class="roadmap-section">
             <div class="container">
                 <div class="grid-header reveal">
@@ -1082,30 +883,43 @@
                 </div>
 
                 <div class="roadmap-timeline">
-                    <!-- Шаг 1: Выборы -->
-                    <div class="roadmap-step step-election reveal">
+                    <div class="roadmap-step step-campaign reveal">
                         <div class="step-marker">01</div>
                         <div class="step-content">
-                            <h3>Выборы</h3>
-                            <div class="candidate-name">Избирается: София Баширова</div>
-                            <p>Честный процесс, где решает голос каждого ученика. Формирование легитимной команды.</p>
-                            <span class="election-date">Результаты 30 ноября</span>
+                            <h3>Старт кампании</h3>
+                            <p>Избирательная кампания проекта «Платформа» уже стартовала. Идёт работа с инициативами и сбор команды.</p>
                         </div>
                     </div>
 
-                    <!-- Шаг 2: Запуск (Блюр) -->
-                    <div class="roadmap-step step-future reveal reveal-delay-1">
+                    <div class="roadmap-step reveal reveal-delay-1">
                         <div class="step-marker">02</div>
+                        <div class="step-content">
+                            <h3>Выборы</h3>
+                            <div class="candidate-name">София Баширова · «Проекты»</div>
+                            <div class="candidate-name">Тамерлан Айдарбеков · «Коммуникация»</div>
+                        </div>
+                    </div>
+
+                    <div class="roadmap-step step-future reveal reveal-delay-2">
+                        <div class="step-marker">03</div>
+                        <div class="step-badge soon">Скоро</div>
                         <div class="step-content">
                             <h3>Запуск проекта</h3>
                             <p>Старт работы кластера, распределение зон ответственности и реализация первых инициатив.</p>
+                        </div>
+                    </div>
+
+                    <div class="roadmap-step step-future reveal">
+                        <div class="step-marker">04</div>
+                        <div class="step-content">
+                            <h3>Первые результаты</h3>
+                            <p>Работа кластера, обратная связь от учеников и первые реализованные инициативы.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- БЛОК ПРОГРАММЫ И САМОВЫДВИЖЕНИЯ -->
         <section class="program-section">
             <div class="container">
                 <div class="grid-header reveal">
@@ -1114,16 +928,11 @@
                 </div>
 
                 <div class="program-grid">
-                    <!-- Документ -->
                     <div class="program-card reveal">
-                        <div class="program-badge">Ожидается 20 ноября</div>
                         <h3>Полный документ предвыборной программы</h3>
-                        <p>20 ноября на этом сайте будет опубликован полный файл с нашей программой, планами и дорожной картой. Ссылка на скачивание появится в этом блоке.</p>
-                        <!-- Пока ссылка пустая, потом можно вставить <a href="ссылка_на_pdf"> -->
-                        <a href="#" class="btn-link" onclick="alert('Документ будет доступен 20 ноября!'); return false;">Скачать программу (появится 20 числа)</a>
-                    </div>
+                        <p>Полный файл с нашей программой, планами и дорожной картой. Скачайте, чтобы ознакомиться с деталями.</p>
+                      <a href="https://cloud.mail.ru/public/Eami/BuTaQaX14" class="btn-link" target="_blank" rel="noopener noreferrer">Скачать программу</a>
 
-                    <!-- Самовыдвижение -->
                     <div class="program-card reveal reveal-delay-1">
                         <div class="program-badge">Открытый парламент</div>
                         <h3>Хотите выдвинуться?</h3>
@@ -1135,7 +944,6 @@
             </div>
         </section>
 
-        <!-- БЛОК СТРУКТУРЫ (КЛАСТЕР) -->
         <section class="structure-section">
             <div class="container">
                 <div class="grid-header reveal">
@@ -1144,44 +952,36 @@
                 </div>
 
                 <div class="structure-layout">
-                    <!-- Текст -->
                     <div class="structure-text reveal">
                         <h3>Сектора передают инициативы через Кластер</h3>
                         <p>Мы отходим от формата «один президент». Наша модель — это <strong>Кластер</strong>, который собирает и фильтрует документы и идеи от секторов.</p>
                         <p>Этот поток позволяет избежать бюрократии и напрямую доносить суть до администрации.</p>
-                        
+
                         <ul>
-                            <li>Сектор коммуникаций (диалог и защита)</li>
-                            <li>Сектор проектов (ивенты и цифра)</li>
+                            <li>Сектор коммуникаций (диалог и защита) — Тамерлан Айдарбеков</li>
+                            <li>Сектор проектов (ивенты и цифра) — София Баширова</li>
                             <li>Сектор исполнения (контроль задач)</li>
                         </ul>
                     </div>
 
-                    <!-- Исправленная визуализация схемы -->
                     <div class="structure-visual reveal" id="clusterDiagram">
-                        <!-- SVG Линии (рисуются поверх сетки) -->
-                        <svg class="lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <!-- Линии от секторов к кластеру -->
-                            <path class="line-path" d="M 15 25 L 45 50" />
-                            <path class="line-path" d="M 15 50 L 45 50" />
-                            <path class="line-path" d="M 15 75 L 45 50" />
-                            <!-- Линия от кластера к администрации -->
-                            <path class="line-path" d="M 55 50 L 85 50" />
+                        <svg class="lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                            <path class="line-path" d="" />
+                            <path class="line-path" d="" />
+                            <path class="line-path" d="" />
+                            <path class="line-path" d="" />
                         </svg>
 
-                        <!-- Левая колонка (Сектора) -->
                         <div class="flow-col-sectors">
                             <div class="box-sector">Сектор 1</div>
                             <div class="box-sector">Сектор 2</div>
                             <div class="box-sector">Сектор 3</div>
                         </div>
 
-                        <!-- Центр (Кластер) -->
                         <div class="flow-col-cluster">
                             <div class="box-cluster">КЛАСТЕР</div>
                         </div>
 
-                        <!-- Правая колонка (Администрация) -->
                         <div class="flow-col-admin">
                             <div class="box-admin">Администрация</div>
                         </div>
@@ -1190,32 +990,20 @@
             </div>
         </section>
 
-        <!-- ТАЙМЕР (ОДИН БЛОК) -->
-        <section class="timer-section">
-            <div class="container reveal">
-                <div class="timer-wrapper">
-                    <div class="timer-header">До примерного оглашения результатов выборов</div>
-                    <div class="timer-value-main" id="days-timer">00</div>
-                    <div class="timer-label">Дней</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Направления -->
         <section class="pillars-section">
             <div class="container">
                 <div class="grid-header reveal">
                     <div class="section-label">Что мы делаем</div>
                     <h2 class="section-title">Наши направления</h2>
                 </div>
-                
+
                 <div class="pillars-list">
-                    <!-- 1 -->
                     <div class="pillar-row reveal">
                         <div class="pillar-num">01</div>
                         <div class="pillar-title">Платформа.<br>Коммуникация</div>
                         <div class="pillar-desc">
                             Создаст безопасное и простое объединение, а также безопасные каналы общения между школой и учениками.
+                            <span class="pillar-curator">Представитель направления — Тамерлан Айдарбеков</span>
                             <ul>
                                 <li>Анонимные опросы и сбор обратной связи</li>
                                 <li>Система защиты от буллинга</li>
@@ -1223,13 +1011,13 @@
                             </ul>
                         </div>
                     </div>
-                    
-                    <!-- 2 -->
+
                     <div class="pillar-row reveal">
                         <div class="pillar-num">02</div>
                         <div class="pillar-title">Платформа.<br>Проекты</div>
                         <div class="pillar-desc">
                             Превратит интересные идеи в реальность. От банальной работы в цифровой среде до мероприятий.
+                            <span class="pillar-curator">Представитель направления — София Баширова</span>
                             <ul>
                                 <li>Оцифровка школьных процессов</li>
                                 <li>Организация досуга и событий</li>
@@ -1238,7 +1026,6 @@
                         </div>
                     </div>
 
-                    <!-- 3 -->
                     <div class="pillar-row reveal">
                         <div class="pillar-num">03</div>
                         <div class="pillar-title">Изменения<br>самоуправления</div>
@@ -1254,28 +1041,26 @@
             </div>
         </section>
 
-        <!-- Команда -->
         <section class="team-section">
             <div class="container">
                 <div class="grid-header reveal">
                     <div class="section-label">Кто мы</div>
                     <h2 class="section-title">Наша команда</h2>
                 </div>
-                
+
                 <div class="team-grid">
                     <div class="team-card reveal reveal-delay-1">
                         <h3 class="team-name">Баширова София</h3>
-                        <span class="team-role">Лидер проекта</span>
+                        <span class="team-role">Лидер проекта · Направление «Проекты»</span>
                     </div>
                     <div class="team-card reveal reveal-delay-2">
                         <h3 class="team-name">Айдарбеков Тамерлан</h3>
-                        <span class="team-role">Лидер проекта</span>
+                        <span class="team-role">Лидер проекта · Направление «Коммуникация»</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Футер -->
         <footer>
             <div class="container">
                 <div class="footer-content reveal">
@@ -1288,67 +1073,96 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            
-            // === 1. ЛОГИКА ПРЕЛОАДЕРА И КАРУСЕЛИ ===
-            const preloader = document.getElementById("preloader");
-            const mainContent = document.getElementById("mainContent");
-            const list = document.getElementById("rotatingList");
-            const items = list.querySelectorAll(".rotating-item");
-            let currentIndex = 0;
-            const totalItems = items.length;
-            
-            let itemHeight = items[0].offsetHeight; 
+        // === 1. ИНТРО ===
+        (function () {
+            'use strict';
 
-            window.addEventListener('resize', () => {
-                itemHeight = items[0].offsetHeight;
-                list.style.transition = 'none';
-                list.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
+            const overlay       = document.getElementById('introOverlay');
+            const stageChevron  = document.getElementById('stageChevron');
+            const stageComms    = document.getElementById('stageComms');
+            const stagePeople   = document.getElementById('stagePeople');
+            const captionComms  = document.getElementById('captionComms');
+            const captionPeople = document.getElementById('captionPeople');
+            const directions    = document.getElementById('directionsScreen');
+            const finalScreen   = document.getElementById('finalScreen');
+            const mainContent   = document.getElementById('mainContent');
+            const skipBtn       = document.getElementById('introSkip');
+
+            let finished = false;
+            const timers = [];
+            const at = (ms, fn) => { timers.push(setTimeout(fn, ms)); };
+            const show = (el) => el.classList.add('visible');
+            const hide = (el) => el.classList.remove('visible');
+
+            function finish() {
+                if (finished) return;
+                finished = true;
+                timers.forEach(clearTimeout);
+                timers.length = 0;
+
+                overlay.classList.add('done');
+                document.body.classList.remove('intro-active');
+                if (mainContent) mainContent.classList.add('visible');
+
                 setTimeout(() => {
-                    list.style.transition = 'transform 1s cubic-bezier(0.16, 1, 0.3, 1)';
-                }, 50);
-            });
+                    overlay.style.display = 'none';
+                    document.dispatchEvent(new Event('platform:intro-complete'));
+                }, 800);
+            }
 
-            items[0].classList.add("blur-in");
-
-            const rotateText = () => {
-                items[currentIndex].classList.add("blur-out");
-                items[currentIndex].classList.remove("blur-in");
-
-                currentIndex = (currentIndex + 1) % totalItems;
-                list.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
-
-                items[currentIndex].classList.remove("blur-out");
-                items[currentIndex].classList.add("blur-in");
-
-                if (currentIndex === 0) {
-                    setTimeout(() => {
-                        list.style.transition = "none";
-                        list.style.transform = "translateY(0)";
-                        items.forEach(item => {
-                            item.classList.remove("blur-out");
-                            item.classList.add("blur-in");
-                        });
-                        setTimeout(() => {
-                            list.style.transition = "transform 1s cubic-bezier(0.16, 1, 0.3, 1)";
-                        }, 50);
-                    }, 1000); 
-                }
+            window.PlatformIntro = {
+                onComplete(cb) {
+                    if (finished) cb();
+                    else document.addEventListener('platform:intro-complete', cb, { once: true });
+                },
+                skip: finish
             };
 
-            const carouselInterval = setInterval(rotateText, 2800);
+            if (skipBtn) skipBtn.addEventListener('click', finish);
 
-            setTimeout(() => {
-                clearInterval(carouselInterval);
-                preloader.classList.add("hidden");
-                
-                setTimeout(() => {
-                    mainContent.classList.add("visible");
-                    startTypewriter();
-                }, 300);
-            }, 5500); 
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                overlay.style.display = 'none';
+                if (mainContent) mainContent.classList.add('visible');
+                finished = true;
+                document.dispatchEvent(new Event('platform:intro-complete'));
+                return;
+            }
 
-            // === 2. ЭФФЕКТ ПЕЧАТНОЙ МАШИНКИ ===
+            document.body.classList.add('intro-active');
+
+            at(100,  () => show(stageChevron));
+            at(1100, () => stageChevron.classList.add('stretch'));
+            at(1400, () => {
+                hide(stageChevron);
+                show(stageComms);
+                show(captionComms);
+            });
+            at(2700, () => {
+                hide(stageComms);
+                hide(captionComms);
+                stageChevron.classList.remove('stretch');
+                show(stageChevron);
+            });
+            at(3100, () => {
+                hide(stageChevron);
+                show(stagePeople);
+                show(captionPeople);
+            });
+            at(4400, () => {
+                hide(stagePeople);
+                hide(captionPeople);
+                show(directions);
+            });
+            at(6100, () => {
+                hide(directions);
+                show(finalScreen);
+            });
+            at(7500, finish);
+        })();
+
+        // === 2. ОСНОВНОЙ САЙТ ===
+        document.addEventListener("DOMContentLoaded", () => {
+
             const typewriterElement = document.getElementById("typewriter-text");
             const phrases = [
                 "Создаем реально работающий парламент.",
@@ -1361,15 +1175,17 @@
             let charIndex = 0;
             let isDeleting = false;
             let typeSpeed = 50;
+            let typewriterStarted = false;
 
             function startTypewriter() {
+                if (typewriterStarted) return;
+                typewriterStarted = true;
                 if (!typewriterElement) return;
                 type();
             }
 
             function type() {
                 const currentPhrase = phrases[phraseIndex];
-
                 if (isDeleting) {
                     typewriterElement.textContent = currentPhrase.substring(0, charIndex - 1);
                     charIndex--;
@@ -1388,39 +1204,16 @@
                     phraseIndex = (phraseIndex + 1) % phrases.length;
                     typeSpeed = 500;
                 }
-
                 setTimeout(type, typeSpeed);
             }
 
-            // === 3. ЛОГИКА ТАЙМЕРА (Только дни до 30 Ноября) ===
-            const targetDate = new Date("November 30, 2026 23:59:59").getTime();
+            if (window.PlatformIntro) {
+                window.PlatformIntro.onComplete(startTypewriter);
+            } else {
+                startTypewriter();
+            }
 
-            const updateTimer = () => {
-                const now = new Date().getTime();
-                const distance = targetDate - now;
-
-                if (distance < 0) {
-                    document.getElementById("days-timer").innerText = "0";
-                    document.querySelector(".timer-label").innerText = "Результаты объявлены!";
-                    return;
-                }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                document.getElementById("days-timer").innerText = days < 10 ? "0" + days : days;
-            };
-
-            setInterval(updateTimer, 1000);
-            updateTimer();
-
-            // === 4. АНИМАЦИИ ПРИ СКРОЛЛЕ ===
             const revealElements = document.querySelectorAll('.reveal');
-            const clusterDiagram = document.getElementById('clusterDiagram');
-
-            const revealOptions = {
-                threshold: 0.1,
-                rootMargin: "0px 0px -100px 0px"
-            };
-
             const revealObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1428,28 +1221,79 @@
                         observer.unobserve(entry.target);
                     }
                 });
-            }, revealOptions);
+            }, { threshold: 0.1, rootMargin: "0px 0px -100px 0px" });
 
-            revealElements.forEach(el => {
-                revealObserver.observe(el);
-            });
+            revealElements.forEach(el => revealObserver.observe(el));
 
-            // Анимация схемы Кластера (рисуем линии)
+            const clusterDiagram = document.getElementById('clusterDiagram');
+            const diagramSvg = clusterDiagram ? clusterDiagram.querySelector('.lines-svg') : null;
+            const diagramPaths = diagramSvg ? Array.from(diagramSvg.querySelectorAll('.line-path')) : [];
+
+            function layoutDiagramLines(animate) {
+                if (!clusterDiagram || !diagramSvg) return;
+                const w = clusterDiagram.clientWidth;
+                const h = clusterDiagram.clientHeight;
+                if (!w || !h) return;
+
+                diagramSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+                const info = (el) => el ? {
+                    left: el.offsetLeft,
+                    right: el.offsetLeft + el.offsetWidth,
+                    cy: el.offsetTop + el.offsetHeight / 2
+                } : null;
+
+                const sectors = Array.from(clusterDiagram.querySelectorAll('.box-sector')).map(info);
+                const cluster = info(clusterDiagram.querySelector('.box-cluster'));
+                const admin = info(clusterDiagram.querySelector('.box-admin'));
+                if (!cluster || !admin) return;
+
+                const defs = [];
+                sectors.forEach(s => { if (s) defs.push(`M ${s.right} ${s.cy} L ${cluster.left} ${cluster.cy}`); });
+                defs.push(`M ${cluster.right} ${cluster.cy} L ${admin.left} ${admin.cy}`);
+
+                const isActive = clusterDiagram.classList.contains('active');
+
+                diagramPaths.forEach((p, i) => {
+                    if (!defs[i]) return;
+                    p.setAttribute('d', defs[i]);
+                    const len = p.getTotalLength();
+                    p.style.strokeDasharray = `${len}`;
+                    const target = isActive ? '0' : `${len}`;
+
+                    if (animate) {
+                        p.style.strokeDashoffset = target;
+                    } else {
+                        p.style.transition = 'none';
+                        p.style.strokeDashoffset = target;
+                        void p.getBoundingClientRect();
+                        p.style.transition = '';
+                    }
+                });
+            }
+
+            const relayoutDiagram = () => layoutDiagramLines(false);
+
+            layoutDiagramLines(false);
+            window.addEventListener('resize', relayoutDiagram);
+            window.addEventListener('load', relayoutDiagram);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(relayoutDiagram);
+            }
+
             const diagramObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        // Даем небольшую задержку перед активацией линий
                         setTimeout(() => {
                             entry.target.classList.add('active');
+                            layoutDiagramLines(true);
                         }, 300);
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.4 }); // Срабатывает, когда 40% схемы видно
+            }, { threshold: 0.4 });
 
-            if (clusterDiagram) {
-                diagramObserver.observe(clusterDiagram);
-            }
+            if (clusterDiagram) diagramObserver.observe(clusterDiagram);
         });
     </script>
 </body>
