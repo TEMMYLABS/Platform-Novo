@@ -50,7 +50,7 @@
             position: fixed;
             inset: 0;
             background: var(--navy);
-            color: var(--white); /* ← ГЛАВНЫЙ ФИКС: без этого «Платформа» была navy-по-navy */
+            color: var(--white); /* Фикс: белый цвет для всех текстов интро */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -346,7 +346,7 @@
             border-radius: 2px 2px 0 0;
         }
 
-        /* Оптимизация: браузер не рендерит секции ниже hero, пока они не подойдут */
+        /* Оптимизация рендеринга */
         .principles-section,
         .roadmap-section,
         .program-section,
@@ -413,6 +413,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.02);
             width: 100%;
             transition: all 0.6s var(--ease-smooth);
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
         .step-content h3 { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--navy); margin-bottom: 12px; line-height: 1.3; }
         .step-content p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
@@ -474,6 +477,7 @@
         .step-future:hover .step-content,
         .step-future:hover .step-marker { opacity: 1; filter: blur(0); }
 
+        /* === ПРОГРАММА === */
         .program-section { padding: 120px 0; background-color: var(--white); border-bottom: 1px solid var(--border); }
         .program-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
         .program-card {
@@ -485,6 +489,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
         .program-badge {
             display: inline-block;
@@ -501,7 +506,7 @@
         }
         .program-card h3 { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--navy); margin-bottom: 20px; line-height: 1.2; }
         .program-card p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 20px; }
-        .program-card .btn-link { margin-top: auto; }
+        .program-card .btn-link, .program-card .btn-outline { margin-top: auto; }
 
         .btn-link {
             display: inline-flex;
@@ -531,10 +536,10 @@
             font-weight: 600;
             border-radius: 6px;
             transition: all 0.3s ease;
-            margin-top: auto;
         }
         .btn-outline:hover { background: var(--navy); color: var(--white); }
 
+        /* === СТРУКТУРА (КЛАСТЕР) === */
         .structure-section { padding: 140px 0; background-color: var(--off-white); }
         .structure-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center; margin-top: 60px; }
         .structure-text h3 { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--navy); margin-bottom: 25px; line-height: 1.2; }
@@ -612,6 +617,7 @@
         .structure-visual.active .box-admin { opacity: 1; transform: translate(0) scale(1); }
         .structure-visual.active .line-path { stroke: var(--navy); }
 
+        /* === НАПРАВЛЕНИЯ === */
         .pillars-section { padding: 160px 0; background-color: var(--white); }
         .pillars-list { display: flex; flex-direction: column; gap: 0; }
         .pillar-row {
@@ -640,6 +646,7 @@
         .pillar-desc li { position: relative; padding-left: 20px; margin-bottom: 10px; font-size: 1rem; font-weight: 500; color: var(--navy); }
         .pillar-desc li::before { content: '—'; position: absolute; left: 0; color: var(--text-muted); }
 
+        /* === КОМАНДА === */
         .team-section { padding: 140px 0; background-color: var(--navy); color: var(--white); }
         .team-section .section-title { color: var(--white); }
         .team-section .section-label { color: rgba(255,255,255,0.5); }
@@ -649,6 +656,7 @@
         .team-name { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
         .team-role { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 30px; display: block; }
 
+        /* === ФУТЕР === */
         footer { background-color: #060B14; color: var(--white); padding: 120px 0; }
         .footer-content { display: flex; justify-content: space-between; align-items: flex-end; }
         .footer-title { font-family: var(--font-heading); font-size: clamp(2.5rem, 4vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; max-width: 600px; line-height: 1.1; }
@@ -656,6 +664,7 @@
         .footer-email::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.2); transition: background 0.4s var(--ease-smooth); }
         .footer-email:hover::after { background: var(--white); }
 
+        /* === АНИМАЦИИ === */
         .reveal {
             opacity: 0;
             transform: translateY(50px);
@@ -666,6 +675,7 @@
         .reveal-delay-1 { transition-delay: 0.15s; }
         .reveal-delay-2 { transition-delay: 0.3s; }
 
+        /* === АДАПТИВНОСТЬ === */
         @media (max-width: 1100px) {
             .roadmap-timeline { grid-template-columns: repeat(2, 1fr); gap: 32px; max-width: 700px; }
         }
@@ -787,7 +797,6 @@
                         </g>
                     </g>
                 </g>
-
             </svg>
 
             <div class="stage-caption" id="captionComms">Коммуникация</div>
@@ -823,7 +832,6 @@
         </div>
 
         <button class="intro-skip" id="introSkip" type="button">Пропустить</button>
-
     </div>
 
     <!-- === ОСНОВНОЙ САЙТ === -->
@@ -927,12 +935,16 @@
                     <h2 class="section-title">Выборная программа</h2>
                 </div>
 
+                <!-- ИСПРАВЛЕННЫЙ БЛОК ПРОГРАММЫ -->
                 <div class="program-grid">
+                    <!-- Карточка 1 -->
                     <div class="program-card reveal">
                         <h3>Полный документ предвыборной программы</h3>
                         <p>Полный файл с нашей программой, планами и дорожной картой. Скачайте, чтобы ознакомиться с деталями.</p>
-                      <a href="https://cloud.mail.ru/public/Eami/BuTaQaX14" class="btn-link" target="_blank" rel="noopener noreferrer">Скачать программу</a>
+                        <a href="https://cloud.mail.ru/public/Eami/BuTaQaX14" class="btn-link" target="_blank" rel="noopener noreferrer">Скачать программу</a>
+                    </div>
 
+                    <!-- Карточка 2 -->
                     <div class="program-card reveal reveal-delay-1">
                         <div class="program-badge">Открытый парламент</div>
                         <h3>Хотите выдвинуться?</h3>
@@ -941,6 +953,8 @@
                         <a href="mailto:platform.novo@inbox.ru?subject=Самовыдвижение в парламент" class="btn-outline">Написать на почту</a>
                     </div>
                 </div>
+                <!-- КОНЕЦ БЛОКА ПРОГРАММЫ -->
+
             </div>
         </section>
 
@@ -1163,6 +1177,7 @@
         // === 2. ОСНОВНОЙ САЙТ ===
         document.addEventListener("DOMContentLoaded", () => {
 
+            // Печатная машинка
             const typewriterElement = document.getElementById("typewriter-text");
             const phrases = [
                 "Создаем реально работающий парламент.",
@@ -1213,6 +1228,7 @@
                 startTypewriter();
             }
 
+            // Анимации при скролле
             const revealElements = document.querySelectorAll('.reveal');
             const revealObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
@@ -1225,6 +1241,7 @@
 
             revealElements.forEach(el => revealObserver.observe(el));
 
+            // Схема Кластера
             const clusterDiagram = document.getElementById('clusterDiagram');
             const diagramSvg = clusterDiagram ? clusterDiagram.querySelector('.lines-svg') : null;
             const diagramPaths = diagramSvg ? Array.from(diagramSvg.querySelectorAll('.line-path')) : [];
